@@ -1,6 +1,6 @@
 """
 reg.py v0.0
-L. J. Duarte, XXXXXXX, P. L. A. Popelier 
+L. J. Duarte, XXXXXX, P. L. A. Popelier 
 
 Library with function to perform the IQA REG analysis. 
 Check for updates at github.com/ljduarte
