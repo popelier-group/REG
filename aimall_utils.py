@@ -48,6 +48,30 @@ def get_atom_list(wfn_file):
     
     return atom_list
 
+def get_atom_list_wfx(wfx_file):
+    #INTERNAL VARIABLES:
+    atom_list = []
+    
+    #OPEN FILE:
+    file = open(wfx_file, "r")
+    lines = file.readlines() #Convert file into a array of lines
+    file.close() #Close file
+    
+    #ERRORS:
+    if "<Nuclear Names>" not in lines[33]:
+        raise ValueError("Atomic labels not found")  #Checks if atomic list exist inside file
+        
+    #GET ATOM LIST:
+    for i in range(len(lines)):
+        if "<Nuclear Names>" in lines[i]:
+                i+=1
+                while "</Nuclear Names>" not in lines[i]:
+                    split_line = lines[i].split()
+                    atom_list.append(split_line[0].lower()) # uppercase to lowercase
+                    i+=1
+    
+    return atom_list
+
 """
 ###########################################################################################################
 FUNCTION: get_aimall_wfn_energies
@@ -79,6 +103,22 @@ def get_aimall_wfn_energies(A):
         file.close()
     
     return wfn_energy
+
+def get_aimall_wfx_energies(A):
+    #INTERNAL VARIABLES:
+    wfx_energy = [] #List of wfn files
+
+    #READ FILES 
+    for path in A:
+        file = open(path, "r")
+        lines = file.readlines()
+        #ERRORS:
+        if "<Energy = T + Vne + Vee + Vnn>" not in lines[-6]: #Checks if there is an energy value at the end of wfn file.
+            raise ValueError( "Energy values not found in file: ", path)      
+        wfx_energy.append(float(lines[-5].split()[0]))
+        file.close()
+    
+    return wfx_energy
 
 """
 ###########################################################################################################
@@ -117,8 +157,12 @@ def intra_property_from_int_file(folders, prop, atom_list):
             for i in lines:
                 if 'IQA Energy Components (see "2EDM Note")' in i:
                     start = lines.index(i)
-                elif '2EDM Note:' in i:
+                elif '2EDM Note:' in i: 
                     end = lines.index(i)
+                
+            if end >= len(lines) : #Checks the .int file.
+                raise ValueError( "File is empty or not exists: " + folder + "/" + atom + ".int") 
+                    
             lines = [lines[i] for i in range(start+1, end)]
             for term in prop:
                 for i in lines:
@@ -185,6 +229,10 @@ def inter_property_from_int_file(folders, prop, atom_list):
                         start = lines.index(i)
                     elif '2EDM Note:' in i:
                         end = lines.index(i)
+                        
+                if end >= len(lines) : #Checks the .int file.
+                    raise ValueError( "File is empty or not exists: " + path +"/" + atom1 + "_" + atom2 + ".int") 
+                
                 lines = [lines[i] for i in range(start+1, end)]
                 for term in prop:
                     for i in lines:
