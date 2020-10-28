@@ -1,14 +1,14 @@
 """
-aimall_utils.py v0.0
-L. J. Duarte, XXXXXXX, P. L. A. Popelier 
+gaussian_utils.py v0.1
+L. J. Duarte, F.Falcioni, P. L. A. Popelier
 
 Library with function to submit job to Gaussian and get properties values from output_files
 GAUSSIAN version: G09 / G16
-Check for updates at github.com/ljduarte
+Check for updates at https://github.com/FabioFalcioni/REG.py
 For details about the method, please see XXXXXXX
 
-Please, report bugs and issues to leo.j.duarte@hotmail.com.br
-coded by L. J. Duarte
+Please, report bugs and issues to fabioslefou@gmail.com
+coded by L. J. Duarte and F. Falcioni
 """
 
 import re
@@ -128,6 +128,48 @@ def get_atom_list_wfn_g16(wfn_file):
             atom_list.append(split_line[0].lower()) # uppercase to lowercase
     
     return atom_list
+
+def get_control_coordinates_IRC_g16(output_file):
+    '''
+    FUNCTION: get_control-coordinates
+        get control coordinates from g16 output file
+    INPUT: output_file
+        output_file = Gaussian16 output file for Intrinsic Reaction Coordinate (IRC) scan.
+
+    OUTPUT: coordinates
+        list of the control coordinate of the IRC scan
+
+    ERROR:
+
+    '''
+    #INTERNAL VARIABLES
+    coordinates = []
+    start = 0
+    end = 0
+
+    #WORKING IN THE FILE
+    with open(output_file, 'r') as f:
+        lines = f.readlines()
+
+        #GET THE FIRST/LAST COORDINATE POSITION
+        for i in range(len(lines)):
+            #ERRORS
+            if "Summary of reaction path following" not in lines[i]:
+                raise ValueError("Control coordinates not found. Please, check that you have the g16 IRC output in the running folder")
+
+            if "Summary of reaction path following" in lines[i]:
+                start = i + 3
+
+        for j in range(start, len(lines)):
+            if "---" in lines[j]:
+                end = j
+                break
+
+        #GET COORDINATES LIST
+        for line in lines[start: end]:
+            coordinates.append(float(line.split()[2]))
+
+    return coordinates
 
 def get_mp2_corr(file_list):
     energies = []
