@@ -13,23 +13,22 @@ coded by L. J. Duarte
 
 import re
 
-"""
-###########################################################################################################
-FUNCTION: get_atom_list_wfn_g09
-          get atomic labels from g09 wfn file
-
-INPUT: wfn_file
-    wfn_file = Any wfn file of the desired PES
-           
-OUTPUT: atom_list
-    list of each atom label for all atoms in molecule 
-    
-ERROR:
-    "Atomic labels not found" : Atom list does not exist in wfn_file  
-###########################################################################################################
-"""
-
 def get_atom_list_wfn_g09(wfn_file):
+    """
+    ###########################################################################################################
+    FUNCTION: get_atom_list_wfn_g09
+              get atomic labels from g09 wfn file
+
+    INPUT: wfn_file
+        wfn_file = Any wfn file of the desired PES
+
+    OUTPUT: atom_list
+        list of each atom label for all atoms in molecule
+
+    ERROR:
+        "Atomic labels not found" : Atom list does not exist in wfn_file
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     atom_list = []
     
@@ -50,23 +49,23 @@ def get_atom_list_wfn_g09(wfn_file):
     
     return atom_list
 
-"""
-###########################################################################################################
-FUNCTION: get_atom_list_wfx_g09
-          get atomic labels from g09 wfn file
-
-INPUT: wfn_file
-    wfx_file = Any double wavefunction file of the desired PES
-           
-OUTPUT: atom_list
-    list of each atom label for all atoms in molecule 
-    
-ERROR:
-    "Atomic labels not found" : Atom list does not exist in wfn_file  
-###########################################################################################################
-"""
 
 def get_atom_list_wfx_g09(wfx_file):
+    """
+    ###########################################################################################################
+    FUNCTION: get_atom_list_wfx_g09
+              get atomic labels from g09 wfn file
+
+    INPUT: wfn_file
+        wfx_file = Any double wavefunction file of the desired PES
+
+    OUTPUT: atom_list
+        list of each atom label for all atoms in molecule
+
+    ERROR:
+        "Atomic labels not found" : Atom list does not exist in wfn_file
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     atom_list = []
     
@@ -93,23 +92,23 @@ def get_atom_list_wfx_g09(wfx_file):
     
     return atom_list
 
-"""
-###########################################################################################################
-FUNCTION: get_atom_list_wfn_g16
-          get atomic labels from g16 wfn file
-
-INPUT: wfn_file
-    wfn_file = Any wfn file of the desired PES
-           
-OUTPUT: atom_list
-    list of each atom label for all atoms in molecule 
-    
-ERROR:
-    "Atomic labels not found" : Atom list does not exist in wfn_file  
-###########################################################################################################
-"""
 
 def get_atom_list_wfn_g16(wfn_file):
+    """
+    ###########################################################################################################
+    FUNCTION: get_atom_list_wfn_g16
+              get atomic labels from g16 wfn file
+
+    INPUT: wfn_file
+        wfn_file = Any wfn file of the desired PES
+
+    OUTPUT: atom_list
+        list of each atom label for all atoms in molecule
+
+    ERROR:
+        "Atomic labels not found" : Atom list does not exist in wfn_file
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     atom_list = []
     

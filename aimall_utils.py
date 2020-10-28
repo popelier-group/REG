@@ -11,23 +11,24 @@ Please, report bugs and issues to leo.j.duarte@hotmail.com.br
 coded by L. J. Duarte
 """
 
-"""
-###########################################################################################################
-FUNCTION: get_atom_list
-          get atomic labels from wfn file
-
-INPUT: wfn_file
-    wfn_file = Any wfn file of the desired PES
-           
-OUTPUT: atom_list
-    list of each atom label for all atoms in molecule 
-    
-ERROR:
-    "Atomic labels not found" : Atom list does not exist in wfn_file  
-###########################################################################################################
-"""
 
 def get_atom_list(wfn_file):
+    """
+    ###########################################################################################################
+    FUNCTION: get_atom_list
+              get atomic labels from wfn file
+
+    INPUT: wfn_file
+        wfn_file = Any wfn file of the desired PES
+
+    OUTPUT: atom_list
+        list of each atom label for all atoms in molecule
+
+    ERROR:
+        "Atomic labels not found" : Atom list does not exist in wfn_file
+    ###########################################################################################################
+    """
+
     #INTERNAL VARIABLES:
     atom_list = []
     
@@ -72,23 +73,24 @@ def get_atom_list_wfx(wfx_file):
     
     return atom_list
 
-"""
-###########################################################################################################
-FUNCTION: get_aimall_wfn_energies
-          get all wfn energies from the wavefunction files (wfn)
 
-INPUT: A
-    A = list of all wfn files of the PES
-           
-OUTPUT: wfn_energy
-    wfn_energy = list of energies for each PES point 
-    
-ERROR:
-    "Energy values not found in file : file_name" : No energy values in file_name  
-###########################################################################################################
-"""    
       
 def get_aimall_wfn_energies(A):
+    """
+    ###########################################################################################################
+    FUNCTION: get_aimall_wfn_energies
+              get all wfn energies from the wavefunction files (wfn)
+
+    INPUT: A
+        A = list of all wfn files of the PES
+
+    OUTPUT: wfn_energy
+        wfn_energy = list of energies for each PES point
+
+    ERROR:
+        "Energy values not found in file : file_name" : No energy values in file_name
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     wfn_energy = [] #List of wfn files
 
@@ -120,26 +122,27 @@ def get_aimall_wfx_energies(A):
     
     return wfx_energy
 
-"""
-###########################################################################################################
-FUNCTION: intra_property_from_int_file
-          get IQA intra-atomic properties from int files
 
-INPUT: A
-    folders = path to _atomicfiles folders
-    prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']" 
-    atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]       
-
-OUTPUT: [intra_properties, contributions_list]
-    intra_properties = array of array containing the IQA values for eacha atom for each geometry
-    contributions_list = list of contributions  organized in the same order as in intra_properties
-    
-ERROR:
-    
-###########################################################################################################
-""" 
 
 def intra_property_from_int_file(folders, prop, atom_list):
+    """
+    ###########################################################################################################
+    FUNCTION: intra_property_from_int_file
+              get IQA intra-atomic properties from int files
+
+    INPUT: A
+        folders = path to _atomicfiles folders
+        prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']"
+        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
+
+    OUTPUT: [intra_properties, contributions_list]
+        intra_properties = array of array containing the IQA values for eacha atom for each geometry
+        contributions_list = list of contributions  organized in the same order as in intra_properties
+
+    ERROR:
+
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     temp1 = [] #Temporary array
     temp2 = [] #Temporary array
@@ -189,26 +192,27 @@ def intra_property_from_int_file(folders, prop, atom_list):
        
     return intra_properties, contributions_list
 
-"""
-###########################################################################################################
-FUNCTION: inter_property_from_int_file
-          get IQA interatomic properties from int files
 
-INPUT: A
-    folders = path to _atomicfiles folders
-    prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']" 
-    atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]       
-
-OUTPUT: [intra_properties, contributions_list]
-    intra_properties = array of array containing the IQA values for eacha atom for each geometry
-    contributions_list = list of contributions  organized in the same order as in intra_properties
-    
-ERROR:
-    
-###########################################################################################################
-""" 
 
 def inter_property_from_int_file(folders, prop, atom_list):
+    """
+    ###########################################################################################################
+    FUNCTION: inter_property_from_int_file
+              get IQA interatomic properties from int files
+
+    INPUT: A
+        folders = path to _atomicfiles folders
+        prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']"
+        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
+
+    OUTPUT: [intra_properties, contributions_list]
+        intra_properties = array of array containing the IQA values for eacha atom for each geometry
+        contributions_list = list of contributions  organized in the same order as in intra_properties
+
+    ERROR:
+
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES:
     temp1 = [] #Temporary array
     temp2 = [] #Temporary array

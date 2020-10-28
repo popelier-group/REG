@@ -123,10 +123,9 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
     color_list=['blue', 'darkgreen', 'darkred', 'yellow', 'cyan', 'magenta', 'grey', 'salmon',
                 'seagreen', 'aquamarine', 'lightgreen', 'silver', 'lime', 'indigo', 'indianred']
 
-    fig = plt.figure(figsize=(8,5))
+    fig = plt.figure(figsize=(12,5))
     graph = plt.subplot(111)
     graph.plot(coordinate, wfn_energy, 'o', color='black')
-    
     if label == True:
         for i in range(len(wfn_energy)):
             graph.annotate(str(i), [coordinate[i], wfn_energy[i]])
@@ -170,10 +169,10 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
             text.append(graph.text(x_pos, y_pos,  str(i+2), fontsize=14))
             start=critical_points[i]
         adjust_text(text)
-    
+    fig.autofmt_xdate()
     if save == True:
         fig.savefig(file_name, dpi=300)
-    
+
     return
     
 

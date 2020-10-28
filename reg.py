@@ -10,30 +10,31 @@ Please, report bugs and issues to leo.j.duarte@hotmail.com.br
 coded by L. J. Duarte
 """
 
-"""
-###########################################################################################################
-FUNCTION: regression
-          Perform a linear regression between A and B (B = slope*A + intercept)
 
-INPUT: A, B and mode
-    A = X values
-    B = Y values
-    mode = None (default) : for regular linear regression
-           "norm"         : use normalized values of A and B
-           "std"          : use standardized values for A and B
-           
-OUTPUT: [slope, intercept, person]
-    slope     : angular coeficient of the linear regression
-    intercept : linear coeficient of the linear regression
-    pearson    : Pearson correlation coefficient
-    
-ERROR:
-    "Arrays must have the same size" : A and B have different sizes.
-    "Mode not recognized. Use None, 'norm' or, 'std'" : invalide value for 'mode'
-###########################################################################################################
-"""
 
 def regression(A, B, mode=None):
+    """
+    ###########################################################################################################
+    FUNCTION: regression
+              Perform a linear regression between A and B (B = slope*A + intercept)
+
+    INPUT: A, B and mode
+        A = X values
+        B = Y values
+        mode = None (default) : for regular linear regression
+               "norm"         : use normalized values of A and B
+               "std"          : use standardized values for A and B
+
+    OUTPUT: [slope, intercept, person]
+        slope     : angular coeficient of the linear regression
+        intercept : linear coeficient of the linear regression
+        pearson    : Pearson correlation coefficient
+
+    ERROR:
+        "Arrays must have the same size" : A and B have different sizes.
+        "Mode not recognized. Use None, 'norm' or, 'std'" : invalide value for 'mode'
+    ###########################################################################################################
+    """
     #ERRORS:  
     if len(A) != len(B): #Checks if A and B have the same size
         return ValueError("Arrays must have the same size") 
@@ -68,30 +69,31 @@ def regression(A, B, mode=None):
     
     return slope, intercept, pearson
 
-"""
-###########################################################################################################
-FUNCTION: find_critical
-          Takes the X and Y values of a function and return the critical points
-          that fit the desirable criteria.
-          
-INPUT: Y, X, min_points, use_inflex
-    Y = ordinate values of a function
-    C = abcissa values of a function
-    min_point = 5 (default) : minimum amount of points between two critical points
-    use_inflex = False (default) : Not search for inflexion points (second derivative = 0)
-                 True            : Search for inflexion points (second derivative = 0)
-           
-OUTPUT: critical_point_list
-    critical_point_list = Array containing the index of critical points (zero indexed)    
 
-ERROR:
-    "Arrays must have the same size" : X and Y have different sizes.
-    "Invalid value. Use True or False" : invalid value for use_inflex
-    "Too many points between two critical points" : min_points must be lower than the X array length
-###########################################################################################################
-"""
 
 def find_critical(Y,X, min_points=3, use_inflex=False):
+    """
+    ###########################################################################################################
+    FUNCTION: find_critical
+              Takes the X and Y values of a function and return the critical points
+              that fit the desirable criteria.
+
+    INPUT: Y, X, min_points, use_inflex
+        Y = ordinate values of a function
+        C = abcissa values of a function
+        min_point = 5 (default) : minimum amount of points between two critical points
+        use_inflex = False (default) : Not search for inflexion points (second derivative = 0)
+                     True            : Search for inflexion points (second derivative = 0)
+
+    OUTPUT: critical_point_list
+        critical_point_list = Array containing the index of critical points (zero indexed)
+
+    ERROR:
+        "Arrays must have the same size" : X and Y have different sizes.
+        "Invalid value. Use True or False" : invalid value for use_inflex
+        "Too many points between two critical points" : min_points must be lower than the X array length
+    ###########################################################################################################
+    """
     #ERRORS:  
     if len(Y) != len(X): ## Checks if X and Y have the same size
         raise ValueError("Arrays must have the same size") 
@@ -163,25 +165,26 @@ def find_critical(Y,X, min_points=3, use_inflex=False):
        
     return critical_point_list
 
-"""
-###########################################################################################################
-FUNCTION: split_segm
-          Takes the A array and divide it into N arrays according with the number of 
-          critical points. Each array corresponds to a segment of the REG analysis.
-          
-INPUT: A, critical_point_list
-    A = Array containing the abcissa values of a function 
-    critical_points_list = list of the index of the critical points (zero indexed)
- 
-OUTPUT: segm
-    segm = Array of arrays containing the values of A for each segment    
 
-ERROR:
-    "Invalid critical point index" : index of critical point out of range in the function array.
-###########################################################################################################
-"""
 
 def split_segm(A, critical_point_list):
+    """
+    ###########################################################################################################
+    FUNCTION: split_segm
+              Takes the A array and divide it into N arrays according with the number of
+              critical points. Each array corresponds to a segment of the REG analysis.
+
+    INPUT: A, critical_point_list
+        A = Array containing the abcissa values of a function
+        critical_points_list = list of the index of the critical points (zero indexed)
+
+    OUTPUT: segm
+        segm = Array of arrays containing the values of A for each segment
+
+    ERROR:
+        "Invalid critical point index" : index of critical point out of range in the function array.
+    ###########################################################################################################
+    """
     critical_point_list = list(set(critical_point_list)) ## Remove duplicates and sort in crescent order
     #ERRORS:
     if critical_point_list[-1] >= len(A): ## Checks if index of critical point is in range of function
@@ -199,37 +202,37 @@ def split_segm(A, critical_point_list):
             start = i
     segm.append([A[j] for j in range(start, end)])
     return segm
-    
-"""
-###########################################################################################################
-FUNCTION: reg
-          Perform the REG analysis over all contributions inside "terms" array
-          
-INPUT:  wfn_energy, control_coord, terms, critical, np, inflex, critical_index, mode
-    wfn_energy = Array containing the energy values for each point (PES - Energy)
-    control_coord = Array containing the control coodinate values for each point (PES - Coordinate)
-    terms = Array of arrays, each one corresponding to one IQA contribution. 
-    critical = True(default): Search for critical points
-             = False        : user must provide the critical point index array
-    np = 5(default):        :  minimum amount of points between two critical points (used if critical == True)
-    use_inflex = False (default) : Not search for inflexion points (second derivative = 0) (used if critical == True)
-                 True            : Search for inflexion points (second derivative = 0 (used if critical == True)
-    critical_index = [](default) : list of critical points provided by the user. (used if critical == False)
-    mode = None                    : for regular linear regression
-           "norm"(default)         : use normalized values of A and B
-           "std"                   : use standardized values for A and B
-           
-OUTPUT: [REG_values/pearson_values][segment]
-    REG_values = array of REG coefficients for each contribution. Each array correspond to a segment
-    pearson_values = array of Pearson coefficients for each contribution. Each array correspond to a segment
 
-ERROR:
-     "PES abcissa and ordenate must have same number of points" : wfn_energy and control_coord have differnt sizes
-     "Contributions arrays must have same size": arrays inside terms have diferent sizes
-###########################################################################################################
-"""
     
 def reg(wfn_energy, control_coord, terms, critical=True, np=5, inflex=True, critical_index= [ ], mode="norm"):
+    """
+    ###########################################################################################################
+    FUNCTION: reg
+              Perform the REG analysis over all contributions inside "terms" array
+
+    INPUT:  wfn_energy, control_coord, terms, critical, np, inflex, critical_index, mode
+        wfn_energy = Array containing the energy values for each point (PES - Energy)
+        control_coord = Array containing the control coodinate values for each point (PES - Coordinate)
+        terms = Array of arrays, each one corresponding to one IQA contribution.
+        critical = True(default): Search for critical points
+                 = False        : user must provide the critical point index array
+        np = 5(default):        :  minimum amount of points between two critical points (used if critical == True)
+        use_inflex = False (default) : Not search for inflexion points (second derivative = 0) (used if critical == True)
+                     True            : Search for inflexion points (second derivative = 0 (used if critical == True)
+        critical_index = [](default) : list of critical points provided by the user. (used if critical == False)
+        mode = None                    : for regular linear regression
+               "norm"(default)         : use normalized values of A and B
+               "std"                   : use standardized values for A and B
+
+    OUTPUT: [REG_values/pearson_values][segment]
+        REG_values = array of REG coefficients for each contribution. Each array correspond to a segment
+        pearson_values = array of Pearson coefficients for each contribution. Each array correspond to a segment
+
+    ERROR:
+         "PES abcissa and ordenate must have same number of points" : wfn_energy and control_coord have differnt sizes
+         "Contributions arrays must have same size": arrays inside terms have diferent sizes
+    ###########################################################################################################
+    """
     #ERRORS:
     if len(wfn_energy) != len(control_coord): # Checks if abcissa and ordenate of PES have same size
         raise ValueError("PES abcissa and ordenate must have same number of points")  
@@ -272,26 +275,27 @@ def reg(wfn_energy, control_coord, terms, critical=True, np=5, inflex=True, crit
  
     return REG_values, pearson_values
 
-"""
-###########################################################################################################
-FUNCTION: integration_error
-          calculates integration error for each PES point
 
-INPUT: wfn_energies, IQA_energies
-    wfn_energies = list of total energies form wfn files
-    IQA_energies = list of total energy obtained from IQA terms       
-
-OUTPUT: [error, RMSE]
-    error = list of wfn_energies - IQA_energies
-    RMSE = Root mean square error
-    
-ERROR:
-    "Arrays must have the same size" : wfn_energies and IQA_energies have different sizes.
-
-###########################################################################################################
-""" 
 
 def integration_error(wfn_energies, IQA_energies):
+    """
+    ###########################################################################################################
+    FUNCTION: integration_error
+              calculates integration error for each PES point
+
+    INPUT: wfn_energies, IQA_energies
+        wfn_energies = list of total energies form wfn files
+        IQA_energies = list of total energy obtained from IQA terms
+
+    OUTPUT: [error, RMSE]
+        error = list of wfn_energies - IQA_energies
+        RMSE = Root mean square error
+
+    ERROR:
+        "Arrays must have the same size" : wfn_energies and IQA_energies have different sizes.
+
+    ###########################################################################################################
+    """
     #ERRORS:  
     if len(wfn_energies) != len(IQA_energies): ## Checks if X and Y have the same size
         raise ValueError("Arrays must have the same size")
@@ -304,26 +308,27 @@ def integration_error(wfn_energies, IQA_energies):
     return error, RMSE
     
 
-"""
-###########################################################################################################
-FUNCTION: group_intra
-          group IQA intra-atomic terms into the user-defined groups
-          
-INPUT: intra_energies, intra_energies_header, groups
-    intra_energies: list of IQA intra-atomic terms
-    intra_energies_header: header of IQA intra atomic temrs.
-    groups: list of list of atomic labels, each internal list correspond to a diferent group
-    
-OUTPUT: [new_terms, new_header]
-    new_terms: list of the grouped IQA terms values
-    new_header: list of the grouped terms header
-    
-ERROR:
-    
-###########################################################################################################
-"""
+
 
 def group_intra(intra_energies, intra_energies_header, groups):
+    """
+    ###########################################################################################################
+    FUNCTION: group_intra
+              group IQA intra-atomic terms into the user-defined groups
+
+    INPUT: intra_energies, intra_energies_header, groups
+        intra_energies: list of IQA intra-atomic terms
+        intra_energies_header: header of IQA intra atomic temrs.
+        groups: list of list of atomic labels, each internal list correspond to a diferent group
+
+    OUTPUT: [new_terms, new_header]
+        new_terms: list of the grouped IQA terms values
+        new_header: list of the grouped terms header
+
+    ERROR:
+
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES
     new_terms = []
     new_header = []
@@ -353,26 +358,27 @@ def group_intra(intra_energies, intra_energies_header, groups):
                     
     return new_terms, new_header
 
-"""
-###########################################################################################################
-FUNCTION: group_inter
-          group IQA interatomic terms into the user-defined groups
-          
-INPUT: inter_energies, inter_energies_header, groups
-    inter_energies: list of IQA interatomic terms
-    inter_energies_header: header of IQA interatomic temrs.
-    groups: list of list of atomic labels, each internal list correspond to a diferent group
-    
-OUTPUT: [new_terms, new_header]
-    new_terms: list of the grouped IQA terms values
-    new_header: list of the grouped terms header
-    
-ERROR:
-    
-###########################################################################################################
-"""
+
 
 def group_inter(inter_energies, inter_energies_header, groups):
+    """
+    ###########################################################################################################
+    FUNCTION: group_inter
+              group IQA interatomic terms into the user-defined groups
+
+    INPUT: inter_energies, inter_energies_header, groups
+        inter_energies: list of IQA interatomic terms
+        inter_energies_header: header of IQA interatomic temrs.
+        groups: list of list of atomic labels, each internal list correspond to a diferent group
+
+    OUTPUT: [new_terms, new_header]
+        new_terms: list of the grouped IQA terms values
+        new_header: list of the grouped terms header
+
+    ERROR:
+
+    ###########################################################################################################
+    """
     #INTERNAL VARIABLES
     temp_terms = []
     new_header = []
