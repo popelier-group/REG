@@ -149,26 +149,27 @@ def get_control_coordinates_IRC_g16(output_file):
     coordinates = []
     start = 0
     end = 0
+    found = False
 
     #WORKING IN THE FILE
     with open(output_file, 'r') as f:
         lines = f.readlines()
-
-        #GET THE FIRST/LAST COORDINATE POSITION
+        # GET THE FIRST/LAST COORDINATE POSITION
         for i in range(len(lines)):
-            #ERRORS
-            if "Summary of reaction path following" not in lines[i]:
-                raise ValueError("Control coordinates not found. Please, check that you have the g16 IRC output in the running folder")
-
             if "Summary of reaction path following" in lines[i]:
                 start = i + 3
+                found = True
+
+        # ERRORS
+        if found is False:
+            raise ValueError("Control coordinates not found. Please, check that you have the g16 IRC output in the running folder")
 
         for j in range(start, len(lines)):
             if "---" in lines[j]:
                 end = j
                 break
 
-        #GET COORDINATES LIST
+        # GET COORDINATES LIST
         for line in lines[start: end]:
             coordinates.append(float(line.split()[2]))
 
