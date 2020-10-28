@@ -131,6 +131,7 @@ def get_atom_list_wfn_g16(wfn_file):
 
 def get_control_coordinates_IRC_g16(output_file):
     '''
+    ###########################################################################################################
     FUNCTION: get_control-coordinates
         get control coordinates from g16 output file
     INPUT: output_file
@@ -140,6 +141,8 @@ def get_control_coordinates_IRC_g16(output_file):
         list of the control coordinate of the IRC scan
 
     ERROR:
+        "Control coordinates not found. Please, check that you have the g16 IRC output in the running folder"
+    ###########################################################################################################
 
     '''
     #INTERNAL VARIABLES
