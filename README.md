@@ -5,4 +5,4 @@ Please, visit https://github.com/ljduarte/REG.py for the original code.
 
 The manual.pdf contains the information regarding the theory and the code implementation. 
 
-Please, report bugs and issues to fabioslefou@gmail.com
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
