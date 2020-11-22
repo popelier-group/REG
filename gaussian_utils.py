@@ -7,7 +7,7 @@ GAUSSIAN version: G09 / G16
 Check for updates at https://github.com/FabioFalcioni/REG.py
 For details about the method, please see XXXXXXX
 
-Please, report bugs and issues to fabio.falcioni@manchester.com
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 coded by L. J. Duarte and F. Falcioni
 """
 
