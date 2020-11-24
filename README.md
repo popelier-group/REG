@@ -8,4 +8,4 @@ The manual.pdf contains the information regarding the theory and the code implem
 -reg_updates:
 Bug fixes and additions to REG Analysis
 
-Please, report bugs and issues to fabioslefou@gmail.com
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
