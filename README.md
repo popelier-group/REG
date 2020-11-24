@@ -9,4 +9,4 @@ The manual.pdf contains the information regarding the theory and the code implem
 A simple and basic GUI has been implemented for files and options management. This is contained in the reg_analysis.py and runs with PySimpleGUI package. Keep in mind that this is in early stages.
 For now, it works only on full atomic REG analysis (grouping of atoms for bigger systems will be implemented in the future).
 
-Please, report bugs and issues to fabioslefou@gmail.com
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
