@@ -8,4 +8,4 @@ The manual.pdf contains the information regarding the theory and the code implem
 -SMALL BUGS FIXES:
 this branch contains all the small bugs found throughout the code.
 
-Please, report bugs and issues to fabioslefou@gmail.com
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
