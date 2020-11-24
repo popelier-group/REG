@@ -255,23 +255,32 @@ def reg(wfn_energy, control_coord, terms, critical=True, np=5, inflex=True, crit
     else:
         critical_points_list =  critical_index #User provides the critical points index
 
-    #DIVIDE WFN ENERGY INTO SEGMENTS:
-    split_wfn = split_segm(wfn_energy, critical_points_list)
-    
-
-    #DIVIDE TERMS INTO SEGMENTS:    
-    for A in terms:
-        split_terms.append(split_segm(A, critical_points_list))
-      
-    #LINEAR REGREESSION FOR CONTRIBUITON INSIDE EACH SEGMENT:
-    for i in range(len(critical_points_list)+1):
-        for A in split_terms:
-            temp_REG.append(regression(split_wfn[i], A[i], mode=mode)[0])
-            temp_pearson.append(regression(split_wfn[i], A[i], mode=mode)[2])
+    #SINGLE SEGMENT REG
+    if not critical_points_list and critical==False:
+        for A in terms:
+            temp_REG.append(regression(wfn_energy,A,mode=mode)[0])
+            temp_pearson.append(regression(wfn_energy,A,mode=mode)[2])
         REG_values.append(temp_REG)
         pearson_values.append(temp_pearson)
         temp_REG = []
-        temp_pearson = []
+        temp_pearson= []
+    else:
+    #DIVIDE WFN ENERGY INTO SEGMENTS:
+        split_wfn = split_segm(wfn_energy, critical_points_list)
+    
+    #DIVIDE TERMS INTO SEGMENTS:
+        for A in terms:
+            split_terms.append(split_segm(A, critical_points_list))
+      
+    #LINEAR REGREESSION FOR CONTRIBUITON INSIDE EACH SEGMENT:
+        for i in range(len(critical_points_list)+1):
+            for A in split_terms:
+                temp_REG.append(regression(split_wfn[i], A[i], mode=mode)[0])
+                temp_pearson.append(regression(split_wfn[i], A[i], mode=mode)[2])
+            REG_values.append(temp_REG)
+            pearson_values.append(temp_pearson)
+            temp_REG = []
+            temp_pearson = []
  
     return REG_values, pearson_values
 
