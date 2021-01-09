@@ -8,11 +8,11 @@ import reg_vis as rv
 ##############################    OPTIONS    ##################################
 SYS = 'bbr3'
 EQ_DIST = 0
-POINTS =4
+POINTS = 3
 INFLEX = False
 WRITE = True
-AUTO = True   
-tp = [7, 15]
+AUTO = False
+tp = []
 
 SAVE_FIG = True
 ANNOTATE = True
@@ -29,10 +29,10 @@ n_terms = 4
 
 #DEFINE PATHS AND FILES:
 path = "../rehybridization/" + SYS +'/'
-A=[i for i in range(0, 6)]
+A=[i for i in range(1,12)]
 
 #DEFINE THE CONTROL COORDINATES:
-cc = [1+i*0.1 for i in A]
+A=[i for i in range(1,12)]
 
 wfn_files = [path + str(format(i, '02d')) + '/' + str(format(i, '02d')) + '.wfn' for i in A]
 folders = [path + str(format(i, '02d')) +'/'+ str(format(i, '02d')) +'_atomicfiles' for i in A]

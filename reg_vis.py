@@ -55,7 +55,7 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
 
 
 ##histogram plot
-    ax2.hist(file['R'], bins=[0.1*i for i in range(0,11,1)], 
+    ax2.hist(file['R'], bins=[0.1*i for i in range(0,11,1)],
              density=0 , color = 'green', edgecolor='black', linewidth=1.2, alpha=0.4)
     ax2.grid(axis='y', alpha=0.75)
     ax2.grid(axis='x', alpha=0.75)
@@ -99,13 +99,13 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
     cond = pos.R > mu
     temp = pos.loc[cond,:]
     n = temp.nlargest(n_term, 'REG').reset_index(drop=True)  
-    text_p = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]       
+    text_p = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]
     adjust_text(text_p, arrowprops=dict(arrowstyle='->', color='black', lw=1.5)) 
 
     cond = neg.R > mu
     temp = neg.loc[cond,:]
     n = temp.nsmallest(n_term, 'REG').reset_index(drop=True)  
-    text_n = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]         
+    text_n = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]
     adjust_text(text_n, arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
 
     ax4.set_title('Relevant IQA contributions')
@@ -117,7 +117,7 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
     
     return
 
-def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=True, annotate=True, 
+def plot_segment(coordinate, wfn_energy, iqa_energy, critical_points, label=False, color=True, annotate=True,
                  title='REG segments', y_label='Energy', x_label='Coordinate', save =False, file_name='segments.png'):
         
     color_list=['blue', 'darkgreen', 'darkred', 'yellow', 'cyan', 'magenta', 'grey', 'salmon',
@@ -126,9 +126,11 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
     fig = plt.figure(figsize=(12,5))
     graph = plt.subplot(111)
     graph.plot(coordinate, wfn_energy, 'o', color='black')
+    graph.plot(coordinate, iqa_energy, 'o', color='red')
     if label == True:
         for i in range(len(wfn_energy)):
-            graph.annotate(str(i), [coordinate[i], wfn_energy[i]])
+            graph.annotate(str(i+1), [coordinate[i], wfn_energy[i]])
+            graph.annotate(str(i+1), [coordinate[i], iqa_energy[i]])
     
     graph.xaxis.set_major_locator(MultipleLocator(2*abs(coordinate[0]-coordinate[1])))
     graph.xaxis.set_minor_locator(MultipleLocator(abs(coordinate[0]-coordinate[1])))    
@@ -175,4 +177,14 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
 
     return
     
-
+def pandas_REG_dataframe_to_table(dataframe, table_name, SAVE_FIG=True):
+    if SAVE_FIG==True:
+        dataframe['R^2'] = round(dataframe['R^2'],5)
+        dataframe['REG'] =round(dataframe['REG'],5)
+        fig, ax = plt.subplots()
+        ax.axis('off')
+        ax.axis('tight')
+        t= ax.table(cellText=dataframe.values, colWidths = [0.4]*len(dataframe.columns),  colLabels=dataframe.columns,  cellLoc='center',loc='center')
+        t.auto_set_font_size(False)
+        t.set_fontsize(12)
+        fig.savefig(table_name, dpi=300, bbox_inches="tight")

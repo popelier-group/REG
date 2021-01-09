@@ -256,7 +256,7 @@ def reg(wfn_energy, control_coord, terms, critical=True, np=5, inflex=True, crit
         critical_points_list =  critical_index #User provides the critical points index
 
     #SINGLE SEGMENT REG
-    if not critical_points_list and critical==False:
+    if not critical_points_list and critical == False:
         for A in terms:
             temp_REG.append(regression(wfn_energy,A,mode=mode)[0])
             temp_pearson.append(regression(wfn_energy,A,mode=mode)[2])

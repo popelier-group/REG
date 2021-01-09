@@ -43,7 +43,7 @@ def get_atom_list(wfn_file):
         
     #GET ATOM LIST:
     for i in range(len(lines)):
-        if "(CENTRE " in lines[i]:
+        if "(CENTRE" in lines[i]:
             split_line = lines[i].split()
             atom_list.append(split_line[0].lower() + str(split_line[1])) # uppercase to lowercase
     
