@@ -26,19 +26,19 @@ def regression(A, B, mode=None):
                "std"          : use standardized values for A and B
 
     OUTPUT: [slope, intercept, person]
-        slope     : angular coeficient of the linear regression
-        intercept : linear coeficient of the linear regression
+        slope     : angular coefficient of the linear regression
+        intercept : linear coefficient of the linear regression
         pearson    : Pearson correlation coefficient
 
     ERROR:
         "Arrays must have the same size" : A and B have different sizes.
-        "Mode not recognized. Use None, 'norm' or, 'std'" : invalide value for 'mode'
+        "Mode not recognized. Use None, 'norm' or, 'std'" : invalid value for 'mode'
     ###########################################################################################################
     """
     #ERRORS:  
     if len(A) != len(B): #Checks if A and B have the same size
         return ValueError("Arrays must have the same size") 
-    if mode != None and mode != "norm" and mode != "std": #Checks if mode in valid
+    if mode != None and mode != "norm" and mode != "std": #Checks if mode is valid
         return ValueError("Mode not recognized. Use None, 'norm' or, 'std'")
     
     #MODIFY A AND B IF REQUESTED   
@@ -229,7 +229,7 @@ def reg(wfn_energy, control_coord, terms, critical=True, np=5, inflex=True, crit
         pearson_values = array of Pearson coefficients for each contribution. Each array correspond to a segment
 
     ERROR:
-         "PES abcissa and ordenate must have same number of points" : wfn_energy and control_coord have differnt sizes
+         "PES abcissa and ordenate must have same number of points" : wfn_energy and control_coord have different sizes
          "Contributions arrays must have same size": arrays inside terms have diferent sizes
     ###########################################################################################################
     """
