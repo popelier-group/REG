@@ -117,7 +117,7 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
     
     return
 
-def plot_segment(coordinate, wfn_energy, iqa_energy, critical_points, label=False, color=True, annotate=True,
+def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=True, annotate=True,
                  title='REG segments', y_label='Energy', x_label='Coordinate', save =False, file_name='segments.png'):
         
     color_list=['blue', 'darkgreen', 'darkred', 'yellow', 'cyan', 'magenta', 'grey', 'salmon',
@@ -126,7 +126,6 @@ def plot_segment(coordinate, wfn_energy, iqa_energy, critical_points, label=Fals
     fig = plt.figure(figsize=(12,5))
     graph = plt.subplot(111)
     graph.plot(coordinate, wfn_energy, 'o', color='black')
-    graph.plot(coordinate, iqa_energy, 'o', color='red')
     if label == True:
         for i in range(len(wfn_energy)):
             graph.annotate(str(i+1), [coordinate[i], wfn_energy[i]])
