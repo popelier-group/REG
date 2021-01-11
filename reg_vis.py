@@ -129,7 +129,7 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
     if label == True:
         for i in range(len(wfn_energy)):
             graph.annotate(str(i+1), [coordinate[i], wfn_energy[i]])
-            graph.annotate(str(i+1), [coordinate[i], iqa_energy[i]])
+
     
     graph.xaxis.set_major_locator(MultipleLocator(2*abs(coordinate[0]-coordinate[1])))
     graph.xaxis.set_minor_locator(MultipleLocator(abs(coordinate[0]-coordinate[1])))    
