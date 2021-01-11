@@ -1,5 +1,5 @@
 """
-auto_reg.py v0.0
+auto_reg.py v0.1
 F. Falcioni, P. L. A. Popelier
 
 Library with function to run a REG analysis
@@ -14,6 +14,7 @@ saved in numbered folders) """
 
 # IMPORT LIBRARIES
 import sys
+sys.path.insert(1, '/mnt/iusers01/pp01/v69787ff/REG/')  # PLEASE INSERT THE PATH OF REG.py folder installation
 import reg
 import aimall_utils as aim_u
 import numpy as np
@@ -25,7 +26,7 @@ import re
 import os
 import time
 
-sys.path.insert(1, '/mnt/iusers01/pp01/v69787ff/REG/')  # PLEASE INSERT THE PATH OF REG.py folder installation
+
 
 ### STARTING TIMER ###
 start_time = time.time()

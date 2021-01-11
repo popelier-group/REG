@@ -178,8 +178,8 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
     
 def pandas_REG_dataframe_to_table(dataframe, table_name, SAVE_FIG=True):
     if SAVE_FIG==True:
-        dataframe['R^2'] = round(dataframe['R^2'],5)
-        dataframe['REG'] =round(dataframe['REG'],5)
+        dataframe['R^2'] = round(dataframe['R^2'],1)
+        dataframe['REG'] =round(dataframe['REG'],2)
         fig, ax = plt.subplots()
         ax.axis('off')
         ax.axis('tight')
