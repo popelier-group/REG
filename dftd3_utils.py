@@ -58,7 +58,7 @@ ERROR:
             if 'analysis of pair-wise terms (in kcal/mol)' in i:
                 start = lines.index(i) + 2
             elif 'distance range (Angstroem) analysis' in i:
-                end = start + int(n * (n - 1) / 2)
+
                 end = lines.index(i) - 1  # check if both are valid*
 
         if end >= len(lines):  # Checks the DFT-D3 file.
