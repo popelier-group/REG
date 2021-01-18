@@ -123,7 +123,7 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
 
     fig = plt.figure(figsize=(12,5))
     graph = plt.subplot(111)
-    graph.plot(coordinate, wfn_energy, 'o', color='black')
+    graph.plot(coordinate,wfn_energy,'o', color='black')
     if label == True:
         for i in range(len(wfn_energy)):
             graph.annotate(str(i+1), [coordinate[i], wfn_energy[i]])

@@ -149,24 +149,24 @@ xyz_files = [gauss_u.get_xyz_file(file) for file in g16_files]
 # Get control coordinate list
 if CONTROL_COORDINATE_TYPE == 'Scan':
     cc = gauss_u.get_control_coordinates_PES_Scan(g16_files, Scan_Atoms)
-    X_LABEL = "Control Coordinate " + r"[$\AA$]"
+    X_LABEL = r"Control Coordinate [$\AA$]"
 elif CONTROL_COORDINATE_TYPE == 'IRC':
     cc = gauss_u.get_control_coordinates_IRC_g16(IRC_output)
-    X_LABEL = X_LABEL = "Control Coordinate " + r"[$\AA$]"
+    X_LABEL = r"Control Coordinate r[$\AA$]"
 else:
     cc = [int(reg_folders[i]) for i in range(0, len(reg_folders))]
     X_LABEL = "Control Coordinate [REG step]"
+cc = np.array(cc)
+if REVERSE:
+    cc = -cc
+
 
 ### INTRA AND INTER ENERGY TERMS ###
 
-# DEFINE THE DESIRED TERMS:
-intra_prop = ['E_IQA_Intra(A)']  # intra atomic properties
-inter_prop = ['VC_IQA(A,B)', 'VX_IQA(A,B)']  # inter atomic properties
 
 # GET TOTAL ENERGY FROM THE .WFN FILES:
 total_energy_wfn = aim_u.get_aimall_wfn_energies(wfn_files)
 total_energy_wfn = np.array(total_energy_wfn)
-
 # GET INTRA-ATOMIC TERMS:
 iqa_intra = aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)[0]
 iqa_intra_header = np.array(
@@ -243,6 +243,17 @@ os.chdir(SYS + "_results")
 dataframe_list = []
 
 if WRITE == True:
+    # initialise excel file
+    writer = pd.ExcelWriter(path=cwd + "_results/REG.xlsx", engine='xlsxwriter')
+
+    # ENERGY ONLY .CSV FILES
+
+    df_energy_output = pd.DataFrame()
+    df_energy_output['WFN'] = total_energy_wfn
+    df_energy_output['IQA'] = total_energy_iqa
+    df_energy_output.to_csv('total_energy.csv', sep=',')
+    df_energy_output.to_excel(writer, sheet_name="total_energy")
+
     # Initialise necessary dataframes
     df_final = pd.DataFrame()
     df_xc_sorted = pd.DataFrame()
@@ -258,6 +269,7 @@ if WRITE == True:
         df_inter.columns = ["REG", "R"]
         df_inter.index = iqa_inter_header
         df_inter.sort_values('REG').to_csv("Inter_seg_" + str(i + 1) + ".csv", sep=',')
+        df_inter.sort_values('REG').to_excel(writer, sheet_name="Inter_seg_" + str(i + 1))
         df_inter = df_inter.rename_axis('TERM').reset_index()
 
         # INTRA-ATOMIC ENERGY DATAFRAME
@@ -266,6 +278,7 @@ if WRITE == True:
         df_intra.columns = ["REG", "R"]
         df_intra.index = iqa_intra_header
         df_intra.sort_values('REG').to_csv("E_Intra_seg_" + str(i + 1) + ".csv", sep=',')
+        df_inter.sort_values('REG').to_excel(writer, sheet_name="E_Intra_seg_" + str(i + 1))
         df_intra = df_intra.rename_axis('TERM').reset_index()
 
         # DISPERTION ENERGY DATAFRAME
@@ -275,6 +288,7 @@ if WRITE == True:
             df_disp.columns = ["REG", "R"]
             df_disp.index = iqa_disp_header
             df_disp.sort_values('REG').to_csv("Disp_seg_" + str(i + 1) + ".csv", sep=',')
+            df_disp.sort_values('REG').to_excel(writer, sheet_name="Disp_seg_" + str(i + 1))
             df_disp = df_disp.rename_axis('TERM').reset_index()
             df_disp.dropna(axis=0, how='any', subset=None,
                            inplace=True)  # get rid of "NaN" terms which have a null REG Value
@@ -294,6 +308,7 @@ if WRITE == True:
             df_pl.columns = ["REG", "R"]
             df_pl.index = iqa_polarisation_headers
             df_pl.sort_values('REG').to_csv("Vpl_seg_" + str(i + 1) + ".csv", sep=',')
+            df_pl.sort_values('REG').to_excel(writer, sheet_name="Vpl_seg_" + str(i + 1))
             df_pl = df_pl.rename_axis('TERM').reset_index()
 
             # CHARGE-TRANSFER ENERGY DATAFRAME
@@ -302,6 +317,7 @@ if WRITE == True:
             df_ct.columns = ["REG", "R"]
             df_ct.index = iqa_charge_transfer_headers
             df_ct.sort_values('REG').to_csv("Vct_seg_" + str(i + 1) + ".csv", sep=',')
+            df_ct.sort_values('REG').to_excel(writer, sheet_name="Vct_seg_" + str(i + 1))
             df_ct = df_ct.rename_axis('TERM').reset_index()
 
             df_temp_ct_pl = pd.concat([df_pl, df_ct]).sort_values('REG').reset_index()
@@ -315,6 +331,7 @@ if WRITE == True:
         df_inter_full.columns = ["REG", "R"]
         df_inter_full.index = E_iqa_inter_headers
         df_inter_full.sort_values('REG').to_csv("E_full_inter_seg_" + str(i + 1) + ".csv", sep=',')
+        df_inter_full.sort_values('REG').to_excel(writer, sheet_name="E_full_inter_seg_" + str(i + 1))
         df_inter_full = df_inter_full.rename_axis('TERM').reset_index()
 
         df_inter_full = df_inter_full.sort_values('REG').reset_index()
@@ -340,13 +357,14 @@ if WRITE == True:
         for j in range(0, len(df_inter['TERM'])):
             if 'VX_IQA' in df_inter['TERM'][j]:
                 df_xc = df_xc.append(df_inter.iloc[j])
-        df_xc = df_xc[col].reset_index()
+        df_xc = df_xc[col]
         df_xc = df_xc.sort_values('REG').reset_index()
         df_xc['TERM'] = df_xc['TERM'].str.replace("VX_IQA\(A,B\)-", 'Vxc(')
         df_xc['TERM'] = df_xc['TERM'].str.replace("_", ',')
         df_xc['TERM'] = df_xc['TERM'] + ')'
 
         df_xc.to_csv("Vxc_seg_" + str(i + 1) + ".csv", sep=',')
+        df_xc.to_excel(writer, sheet_name="Vxc_seg_" + str(i + 1))
         df_xc_sorted = pd.concat(
             [df_xc_sorted, pd.concat([df_xc[-n_terms:], df_xc[:n_terms]], axis=0).sort_values('REG')], axis=1)
 
@@ -356,12 +374,13 @@ if WRITE == True:
         for j in range(0, len(df_inter['TERM'])):
             if 'VC_IQA' in df_inter['TERM'][j]:
                 df_cl = df_cl.append(df_inter.iloc[j])
-        df_cl = df_cl[col].reset_index()
+        df_cl = df_cl[col]
         df_cl = df_cl.sort_values('REG').reset_index()
         df_cl['TERM'] = df_cl['TERM'].str.replace("VC_IQA\(A,B\)-", 'Vcl(')
         df_cl['TERM'] = df_cl['TERM'].str.replace("_", ',')
         df_cl['TERM'] = df_cl['TERM'] + ')'
         df_cl.to_csv("Vcl_seg_" + str(i + 1) + ".csv", sep=',')
+        df_cl.to_excel(writer, sheet_name="Vcl_seg_" + str(i + 1))
         df_cl_sorted = pd.concat(
             [df_cl_sorted, pd.concat([df_cl[-n_terms:], df_cl[:n_terms]], axis=0).sort_values('REG')], axis=1)
 
@@ -382,28 +401,30 @@ if WRITE == True:
 
     # SAVE .csv files and tables .png
     df_final.to_csv('IQA_segment_analysis.csv', sep=',')
+    df_final.to_excel(writer, sheet_name='REG_final')
     rv.pandas_REG_dataframe_to_table(df_final, 'REG_final_table', SAVE_FIG=SAVE_FIG)
     df_cl_sorted.to_csv('IQA_segment_Vcl_analysis.csv', sep=',')
+    df_cl_sorted.to_excel(writer, sheet_name='REG_Vcl')
     rv.pandas_REG_dataframe_to_table(df_cl_sorted, 'REG_Vcl_table', SAVE_FIG=SAVE_FIG)
     df_xc_sorted.to_csv('IQA_segment_Vxc_analysis.csv', sep=',')
+    df_xc_sorted.to_excel(writer, sheet_name='REG_Vxc')
     rv.pandas_REG_dataframe_to_table(df_xc_sorted, 'REG_Vxc_table', SAVE_FIG=SAVE_FIG)
     df_intra_sorted.to_csv('IQA_segment_Eintra_analysis.csv', sep=',')
+    df_intra_sorted.to_excel(writer, sheet_name='REG_Eintra')
     rv.pandas_REG_dataframe_to_table(df_intra_sorted, 'REG_Eintra_table', SAVE_FIG=SAVE_FIG)
     df_inter_full_sorted.to_csv('IQA_segment_full-inter_analysis.csv', sep=',')
+    df_inter_full_sorted.to_excel(writer, sheet_name='REG_E_inter_full')
     rv.pandas_REG_dataframe_to_table(df_inter_full_sorted, 'REG_E_inter_full_table', SAVE_FIG=SAVE_FIG)
     if CHARGE_TRANSFER_POLARISATION:
-        df_ct_pl_sorted.to_csv('IQA_segment_Vcl-Vpl_analysis.csv')
+        df_ct_pl_sorted.to_csv('IQA_segment_Vct-Vpl_analysis.csv')
+        df_ct_pl_sorted.to_excel(writer, sheet_name="REG_Vct-Vpl")
         rv.pandas_REG_dataframe_to_table(df_ct_pl_sorted, 'REG_Vct-Vpl_table', SAVE_FIG=SAVE_FIG)
     if DISPERSION:
         df_dispersion_sorted.to_csv('IQA_segment_Vdisp_analysis.csv', sep=',')
+        df_dispersion_sorted.to_excel(writer, sheet_name="REG_Vdisp")
         rv.pandas_REG_dataframe_to_table(df_dispersion_sorted, 'REG_Vdisp_table', SAVE_FIG=SAVE_FIG)
 
-    # ENERGY ONLY .CSV FILES
-
-    df_energy_output = pd.DataFrame()
-    df_energy_output['WFN'] = total_energy_wfn
-    df_energy_output['IQA'] = total_energy_iqa
-    df_energy_output.to_csv('total_energy.csv', sep=',')
+    writer.save()
 
     rv.plot_violin([dataframe_list[i]['R'] for i in range(len(reg_inter[0]))], save=SAVE_FIG,
                    file_name='violin.png')  # Violing plot of R vs Segments
@@ -418,7 +439,7 @@ if AUTO:
 else:
     critical_points = turning_points
 
-rv.plot_segment(cc, 2625.50 * (total_energy_wfn - total_energy_wfn[0]), critical_points, annotate=ANNOTATE,
+rv.plot_segment(cc, 2625.50 * (total_energy_wfn - min(total_energy_wfn)), critical_points, annotate=ANNOTATE,
                 label=LABELS,
                 y_label=r'Relative Energy [$kJ.mol^{-1}$]', x_label=X_LABEL, title=SYS,
                 save=SAVE_FIG, file_name='REG_analysis.png')

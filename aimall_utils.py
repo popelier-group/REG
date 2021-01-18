@@ -367,7 +367,7 @@ def charge_transfer_and_polarisation_from_int_file(folders, atom_list, inter_pro
     for k in range(len(net_charges)):
         for i in range(len(atom_list)):
             for j in range(i + 1, len(atom_list)):
-                temp1.append((net_charges[k][i] * net_charges[k][j]) / (distance_A_B(xyz_files[k], i + 1, j + 1)))
+                temp1.append((net_charges[k][i] * net_charges[k][j]) / ((distance_A_B(xyz_files[k], i + 1, j + 1))*1.8897259886))
 
     # ORGANIZE CHARGE TRANSFER ARRAY ORDER
     for j in range(int(n * (n - 1) / 2)):
