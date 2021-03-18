@@ -74,7 +74,7 @@ ERROR:
     #        for i in range(j, len(temp1), len(prop)):
     #            temp2.append(temp1[i])
     for j in range(int(n * (n - 1) / 2)):
-        temp2.append([temp1[i] / 602.529 for i in range(j, len(temp1), int(n * (n - 1) / 2))])  # temp2 ?
+        temp2.append([temp1[i] / 627.503 for i in range(j, len(temp1), int(n * (n - 1) / 2))])  # temp2 ?
     start = 0
     #   for j in range(len(prop)):
     for atom_prop in temp2:

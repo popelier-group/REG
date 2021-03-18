@@ -278,7 +278,7 @@ if WRITE == True:
         df_intra.columns = ["REG", "R"]
         df_intra.index = iqa_intra_header
         df_intra.sort_values('REG').to_csv("E_Intra_seg_" + str(i + 1) + ".csv", sep=',')
-        df_inter.sort_values('REG').to_excel(writer, sheet_name="E_Intra_seg_" + str(i + 1))
+        df_intra.sort_values('REG').to_excel(writer, sheet_name="E_Intra_seg_" + str(i + 1))
         df_intra = df_intra.rename_axis('TERM').reset_index()
 
         # DISPERTION ENERGY DATAFRAME
