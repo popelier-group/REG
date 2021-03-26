@@ -230,7 +230,10 @@ if DISPERSION:
 total_energy_iqa = sum(iqa_inter) + sum(iqa_intra)  # used to calculate the integration error
 
 # CALCULATE RECOVERY ERROR
-rmse_integration = reg.integration_error(total_energy_wfn, total_energy_iqa)
+if DISPERSION:
+    rmse_integration = reg.integration_error(total_energy_wfn, total_energy_iqa + total_energy_dispersion)
+else:
+    rmse_integration = reg.integration_error(total_energy_wfn, total_energy_iqa)
 print('Integration error [kJ/mol](RMSE)')
 print(rmse_integration[1])
 
@@ -239,18 +242,20 @@ print(rmse_integration[1])
 #                             WRITE CSV FILES                                 #
 #                                                                             #
 ###############################################################################
-os.chdir(SYS + "_results")
+os.chdir(cwd + '/' + SYS + "_results")
 dataframe_list = []
 
 if WRITE == True:
     # initialise excel file
-    writer = pd.ExcelWriter(path=cwd + "_results/REG.xlsx", engine='xlsxwriter')
+    writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
 
     # ENERGY ONLY .CSV FILES
 
     df_energy_output = pd.DataFrame()
     df_energy_output['WFN'] = total_energy_wfn
     df_energy_output['IQA'] = total_energy_iqa
+    if DISPERSION:
+        df_energy_output['D3'] = total_energy_dispersion
     df_energy_output.to_csv('total_energy.csv', sep=',')
     df_energy_output.to_excel(writer, sheet_name="total_energy")
 
@@ -439,7 +444,7 @@ if AUTO:
 else:
     critical_points = turning_points
 
-rv.plot_segment(cc, 2625.50 * (total_energy_wfn - min(total_energy_wfn)), critical_points, annotate=ANNOTATE,
+rv.plot_segment(cc, 2625.50 * (total_energy_wfn - (sum(total_energy_wfn)/len(total_energy_wfn))), critical_points, annotate=ANNOTATE,
                 label=LABELS,
                 y_label=r'Relative Energy [$kJ.mol^{-1}$]', x_label=X_LABEL, title=SYS,
                 save=SAVE_FIG, file_name='REG_analysis.png')
