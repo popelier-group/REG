@@ -132,9 +132,9 @@ access_rights = 0o755
 try:
     os.mkdir(SYS + "_results", access_rights)
 except OSError:
-    print("Creation of the directory %s failed" % cwd)
+    print("Creation of the directory %s_results failed or has already been created" % cwd)
 else:
-    print("Successfully created the directory %s" % cwd)
+    print("Successfully created the directory %s_results" % cwd)
 
 # GET ATOM LIST FROM ANY .WFN FILE:
 atoms = aim_u.get_atom_list(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
