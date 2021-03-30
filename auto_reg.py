@@ -168,14 +168,12 @@ if REVERSE:
 total_energy_wfn = aim_u.get_aimall_wfn_energies(wfn_files)
 total_energy_wfn = np.array(total_energy_wfn)
 # GET INTRA-ATOMIC TERMS:
-iqa_intra = aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)[0]
-iqa_intra_header = np.array(
-    aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)[1])  # used for reference
+iqa_intra,iqa_intra_header = aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)
+iqa_intra_header = np.array(iqa_intra_header)  # used for reference
 iqa_intra = np.array(iqa_intra)
 # GET INTER-ATOMIC TERMS:
-iqa_inter = aim_u.inter_property_from_int_file(atomic_files, inter_prop, atoms)[0]
-iqa_inter_header = np.array(
-    aim_u.inter_property_from_int_file(atomic_files, inter_prop, atoms)[1])  # used for reference
+iqa_inter,iqa_intra_header = aim_u.inter_property_from_int_file(atomic_files, inter_prop, atoms)
+iqa_inter_header = np.array(iqa_intra_header)  # used for reference
 iqa_inter = np.array(iqa_inter)
 
 ###############################################################################
@@ -204,8 +202,8 @@ if CHARGE_TRANSFER_POLARISATION:
 
 # GET COMBINED INTER-ATOMIC TERMS:
 if FULL_INTERATOMIC_CONTRIBUTION:
-    E_iqa_inter_terms = aim_u.E_IQA_from_int_file(atomic_files, atoms)[0]
-    E_iqa_inter_headers = np.array(aim_u.E_IQA_from_int_file(atomic_files, atoms)[1])
+    E_iqa_inter_terms,E_iqa_inter_headers= aim_u.E_IQA_from_int_file(atomic_files, atoms)
+    E_iqa_inter_headers = np.array(E_iqa_inter_headers)
     E_iqa_inter_terms = np.array(E_iqa_inter_terms)
     # INTER ONLY ATOMIC CONTRIBUTION
     reg_inter_full = reg.reg(total_energy_wfn, cc, E_iqa_inter_terms, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
@@ -219,8 +217,8 @@ if DISPERSION:
 
     folders_disp = [cwd + '/' + reg_folders[i] + '/dft-d3.log' for i in range(0, len(reg_folders))]
     # GET INTER-ATOMIC DISPERSION TERMS:
-    iqa_disp = disp_u.disp_property_from_dftd3_file(folders_disp, atoms)[0]
-    iqa_disp_header = np.array(disp_u.disp_property_from_dftd3_file(folders_disp, atoms)[1])  # used for reference
+    iqa_disp,iqa_disp_header = disp_u.disp_property_from_dftd3_file(folders_disp, atoms)
+    iqa_disp_header = np.array(iqa_disp_header)  # used for reference
     iqa_disp = np.array(iqa_disp)
     # REG
     reg_disp = reg.reg(total_energy_wfn, cc, iqa_disp, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
