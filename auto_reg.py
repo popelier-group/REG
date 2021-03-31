@@ -243,7 +243,7 @@ print(rmse_integration[1])
 os.chdir(cwd + '/' + SYS + "_results")
 dataframe_list = []
 
-if WRITE == True:
+if WRITE:
     # initialise excel file
     writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
 
@@ -296,13 +296,13 @@ if WRITE == True:
             df_disp.dropna(axis=0, how='any', subset=None,
                            inplace=True)  # get rid of "NaN" terms which have a null REG Value
 
-            df_disp = df_disp.sort_values('REG').reset_index()
+            df_disp = df_disp.sort_values('REG').reset_index(drop=True)
             df_disp['TERM'] = df_disp['TERM'].str.replace("E_Disp\(A,B\)-", 'Vdisp(')
             df_disp['TERM'] = df_disp['TERM'].str.replace("_", ',')
             df_disp['TERM'] = df_disp['TERM'] + ')'
-            df_dispersion_sorted = pd.concat(
-                [df_dispersion_sorted, pd.concat([df_disp[-n_terms:], df_disp[:n_terms]], axis=0).sort_values('REG')],
-                axis=1)
+            df_dispersion_sorted = pd.concat([df_dispersion_sorted.reset_index(drop=True),
+                                              pd.concat([df_disp[-n_terms:], df_disp[:n_terms]], axis=0).sort_values(
+                                                  'REG').reset_index(drop=True)], axis=1)
 
         if CHARGE_TRANSFER_POLARISATION:
             # POLARISATION ENERGY DATAFRAME
@@ -323,7 +323,7 @@ if WRITE == True:
             df_ct.sort_values('REG').to_excel(writer, sheet_name="Vct_seg_" + str(i + 1))
             df_ct = df_ct.rename_axis('TERM').reset_index()
 
-            df_temp_ct_pl = pd.concat([df_pl, df_ct]).sort_values('REG').reset_index()
+            df_temp_ct_pl = pd.concat([df_pl, df_ct]).sort_values('REG').reset_index(drop=True)
 
             df_ct_pl_sorted = pd.concat([df_ct_pl_sorted, pd.concat([df_temp_ct_pl[-n_terms:], df_temp_ct_pl[:n_terms]],
                                                                     axis=0).sort_values('REG')], axis=1)
@@ -337,16 +337,16 @@ if WRITE == True:
         df_inter_full.sort_values('REG').to_excel(writer, sheet_name="E_full_inter_seg_" + str(i + 1))
         df_inter_full = df_inter_full.rename_axis('TERM').reset_index()
 
-        df_inter_full = df_inter_full.sort_values('REG').reset_index()
+        df_inter_full = df_inter_full.sort_values('REG').reset_index(drop=True)
         df_inter_full_sorted = pd.concat([df_inter_full_sorted,
                                           pd.concat([df_inter_full[-n_terms:], df_inter_full[:n_terms]],
                                                     axis=0).sort_values('REG')], axis=1)
 
         # TEMPORARY DATAFRAME FOR ALL CONTRIBUTIONS MAIN CONTRIBUTIONS
         if DISPERSION:
-            df_temp = pd.concat([df_intra, df_inter, df_disp]).sort_values('REG').reset_index()
+            df_temp = pd.concat([df_intra, df_inter, df_disp]).sort_values('REG').reset_index(drop=True)
         else:
-            df_temp = pd.concat([df_intra, df_inter]).sort_values('REG').reset_index()
+            df_temp = pd.concat([df_intra, df_inter]).sort_values('REG').reset_index(drop=True)
         df_temp['TERM'] = df_temp['TERM'].str.replace("VC_IQA\(A,B\)-", 'Vcl(')
         df_temp['TERM'] = df_temp['TERM'].str.replace("VX_IQA\(A,B\)-", 'Vxc(')
         df_temp['TERM'] = df_temp['TERM'].str.replace("E_IQA_Intra\(A\)-", 'Eintra(')
@@ -361,7 +361,7 @@ if WRITE == True:
             if 'VX_IQA' in df_inter['TERM'][j]:
                 df_xc = df_xc.append(df_inter.iloc[j])
         df_xc = df_xc[col]
-        df_xc = df_xc.sort_values('REG').reset_index()
+        df_xc = df_xc.sort_values('REG').reset_index(drop=True)
         df_xc['TERM'] = df_xc['TERM'].str.replace("VX_IQA\(A,B\)-", 'Vxc(')
         df_xc['TERM'] = df_xc['TERM'].str.replace("_", ',')
         df_xc['TERM'] = df_xc['TERM'] + ')'
@@ -378,7 +378,7 @@ if WRITE == True:
             if 'VC_IQA' in df_inter['TERM'][j]:
                 df_cl = df_cl.append(df_inter.iloc[j])
         df_cl = df_cl[col]
-        df_cl = df_cl.sort_values('REG').reset_index()
+        df_cl = df_cl.sort_values('REG').reset_index(drop=True)
         df_cl['TERM'] = df_cl['TERM'].str.replace("VC_IQA\(A,B\)-", 'Vcl(')
         df_cl['TERM'] = df_cl['TERM'].str.replace("_", ',')
         df_cl['TERM'] = df_cl['TERM'] + ')'
@@ -388,7 +388,7 @@ if WRITE == True:
             [df_cl_sorted, pd.concat([df_cl[-n_terms:], df_cl[:n_terms]], axis=0).sort_values('REG')], axis=1)
 
         # FILTER CONTRIBUTIONS: Eintra
-        df_intra = df_intra.sort_values('REG').reset_index()
+        df_intra = df_intra.sort_values('REG').reset_index(drop=True)
         df_intra['TERM'] = df_intra['TERM'].str.replace("E_IQA_Intra\(A\)-", 'Eintra(')
         df_intra['TERM'] = df_intra['TERM'].str.replace("_", ',')
         df_intra['TERM'] = df_intra['TERM'] + ')'
@@ -399,8 +399,10 @@ if WRITE == True:
         else:
             df_intra_sorted = pd.concat([df_intra_sorted, pd.concat([df_intra], axis=0).sort_values('REG')], axis=1)
 
-        df_final = pd.concat([df_final, pd.concat([df_temp[-n_terms:], df_temp[:n_terms]], axis=0).sort_values('REG')],
-                             axis=1)
+        df_final = pd.concat([
+            df_final.reset_index(drop=True),
+            pd.concat([df_temp[-n_terms:], df_temp[:n_terms]], axis=0).sort_values('REG').reset_index(drop=True)],
+            axis=1, )
 
     # SAVE .csv files and tables .png
     df_final.to_csv('IQA_segment_analysis.csv', sep=',')
