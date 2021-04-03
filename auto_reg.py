@@ -26,8 +26,6 @@ import re
 import os
 import time
 
-
-
 ### STARTING TIMER ###
 start_time = time.time()
 ##############################    VARIABLES    ##################################
@@ -40,10 +38,13 @@ AUTO = True  # Search for critical points
 turning_points = []  # manually put critical points in the PES if necessary
 # NOTE: If analysing only a single segment (i.e. the PES has no critical points) please put AUTO=False and tp=[]
 
-#DEFINE THE DESIRED TERMS:
-intra_prop = ['E_IQA_Intra(A)'] #intra atomic properties
-inter_prop = ['VC_IQA(A,B)', 'VX_IQA(A,B)'] #inter atomic properties
-REVERSE = True #Reverse the REG points
+# DEFINE THE DESIRED TERMS:
+intra_prop = ['E_IQA_Intra(A)']  # chose the AIMAll intra atomic properties to analyse
+intra_prop_names = ['Eintra']  # names of the properties shown in the output
+inter_prop = ['VC_IQA(A,B)', 'VX_IQA(A,B)', 'E_IQA_Inter(A,B)']  # chose the AIMAll inter atomic properties to analyse
+inter_prop_names = ['Vcl', 'Vxc', 'Einter']  # names of the properties shown in the output
+
+REVERSE = True  # Reverse the REG points
 
 INFLEX = False
 
@@ -53,7 +54,6 @@ Scan_Atoms = [1, 6]  # list of the atoms used for PES Scan (i.e. ModRedundant op
 IRC_output = ''  # insert the g16 output file path if using IRC as control coordinate
 
 CHARGE_TRANSFER_POLARISATION = True  # Split the classical electrostatic term into polarisation and monopolar charge-transfer
-FULL_INTERATOMIC_CONTRIBUTION = True  # Combine classical and exchange-correlation contributions
 
 DISPERSION = True  # Run DFT-D3 program to consider dispersion
 # NOTE: This only works if you have DFT-D3 program installed in the same machine https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3/
@@ -127,14 +127,14 @@ if REVERSE:
     reg_folders = reg_folders[::-1]
 
 os.chdir(cwd)  # working directory
-#Create results directory
+# Create results directory
 access_rights = 0o755
 try:
     os.mkdir(SYS + "_results", access_rights)
 except OSError:
-    print("Creation of the directory %s_results failed or has already been created" % cwd)
+    print("Creation of the directory {a}/{b}_results failed or has already been created".format(a=cwd,b=SYS))
 else:
-    print("Successfully created the directory %s_results" % cwd)
+    print("Successfully created the directory {a}/{b}_results".format(a=cwd,b=SYS))
 
 # GET ATOM LIST FROM ANY .WFN FILE:
 atoms = aim_u.get_atom_list(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
@@ -160,7 +160,6 @@ cc = np.array(cc)
 if REVERSE:
     cc = -cc
 
-
 ### INTRA AND INTER ENERGY TERMS ###
 
 
@@ -168,12 +167,12 @@ if REVERSE:
 total_energy_wfn = aim_u.get_aimall_wfn_energies(wfn_files)
 total_energy_wfn = np.array(total_energy_wfn)
 # GET INTRA-ATOMIC TERMS:
-iqa_intra,iqa_intra_header = aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)
+iqa_intra, iqa_intra_header = aim_u.intra_property_from_int_file(atomic_files, intra_prop, atoms)
 iqa_intra_header = np.array(iqa_intra_header)  # used for reference
 iqa_intra = np.array(iqa_intra)
 # GET INTER-ATOMIC TERMS:
-iqa_inter,iqa_intra_header = aim_u.inter_property_from_int_file(atomic_files, inter_prop, atoms)
-iqa_inter_header = np.array(iqa_intra_header)  # used for reference
+iqa_inter, iqa_inter_header = aim_u.inter_property_from_int_file(atomic_files, inter_prop, atoms)
+iqa_inter_header = np.array(iqa_inter_header)  # used for reference
 iqa_inter = np.array(iqa_inter)
 
 ###############################################################################
@@ -183,9 +182,11 @@ iqa_inter = np.array(iqa_inter)
 ###############################################################################
 
 # INTRA ATOMIC CONTRIBUTION
-reg_intra = reg.reg(total_energy_wfn, cc, iqa_intra, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
+reg_intra = reg.reg(total_energy_wfn, cc, iqa_intra, np=POINTS, critical=AUTO, inflex=INFLEX,
+                    critical_index=turning_points)
 # INTER ATOMIC CONTRIBUTION
-reg_inter = reg.reg(total_energy_wfn, cc, iqa_inter, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
+reg_inter = reg.reg(total_energy_wfn, cc, iqa_inter, np=POINTS, critical=AUTO, inflex=INFLEX,
+                    critical_index=turning_points)
 
 # GET CT and PL TERMS:
 if CHARGE_TRANSFER_POLARISATION:
@@ -196,17 +197,12 @@ if CHARGE_TRANSFER_POLARISATION:
     iqa_polarisation_terms = np.array(iqa_polarisation_terms)
     iqa_charge_transfer_terms = np.array(iqa_charge_transfer_terms)
     # CHARGE TRANSFER CONTRIBUTION
-    reg_ct = reg.reg(total_energy_wfn, cc, iqa_charge_transfer_terms, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
+    reg_ct = reg.reg(total_energy_wfn, cc, iqa_charge_transfer_terms, np=POINTS, critical=AUTO, inflex=INFLEX,
+                     critical_index=turning_points)
     # POLARISATION CONTRIBUTION
-    reg_pl = reg.reg(total_energy_wfn, cc, iqa_polarisation_terms, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
+    reg_pl = reg.reg(total_energy_wfn, cc, iqa_polarisation_terms, np=POINTS, critical=AUTO, inflex=INFLEX,
+                     critical_index=turning_points)
 
-# GET COMBINED INTER-ATOMIC TERMS:
-if FULL_INTERATOMIC_CONTRIBUTION:
-    E_iqa_inter_terms,E_iqa_inter_headers= aim_u.E_IQA_from_int_file(atomic_files, atoms)
-    E_iqa_inter_headers = np.array(E_iqa_inter_headers)
-    E_iqa_inter_terms = np.array(E_iqa_inter_terms)
-    # INTER ONLY ATOMIC CONTRIBUTION
-    reg_inter_full = reg.reg(total_energy_wfn, cc, E_iqa_inter_terms, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
 ### DISPERSION ANALYSIS ###
 if DISPERSION:
     for i in range(0, len(reg_folders)):
@@ -217,15 +213,16 @@ if DISPERSION:
 
     folders_disp = [cwd + '/' + reg_folders[i] + '/dft-d3.log' for i in range(0, len(reg_folders))]
     # GET INTER-ATOMIC DISPERSION TERMS:
-    iqa_disp,iqa_disp_header = disp_u.disp_property_from_dftd3_file(folders_disp, atoms)
+    iqa_disp, iqa_disp_header = disp_u.disp_property_from_dftd3_file(folders_disp, atoms)
     iqa_disp_header = np.array(iqa_disp_header)  # used for reference
     iqa_disp = np.array(iqa_disp)
     # REG
-    reg_disp = reg.reg(total_energy_wfn, cc, iqa_disp, np=POINTS, critical=AUTO, inflex=INFLEX, critical_index=turning_points)
+    reg_disp = reg.reg(total_energy_wfn, cc, iqa_disp, np=POINTS, critical=AUTO, inflex=INFLEX,
+                       critical_index=turning_points)
     total_energy_dispersion = sum(iqa_disp)
 
 # CALCULATE TOTAL ENERGIES
-total_energy_iqa = sum(iqa_inter) + sum(iqa_intra)  # used to calculate the integration error
+total_energy_iqa = sum(iqa_inter[:(len(atoms)*(len(atoms)-1))]) + sum(iqa_intra[:len(atoms)])  # used to calculate the integration error
 
 # CALCULATE RECOVERY ERROR
 if DISPERSION:
@@ -246,9 +243,7 @@ dataframe_list = []
 if WRITE:
     # initialise excel file
     writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
-
     # ENERGY ONLY .CSV FILES
-
     df_energy_output = pd.DataFrame()
     df_energy_output['WFN'] = total_energy_wfn
     df_energy_output['IQA'] = total_energy_iqa
@@ -257,177 +252,101 @@ if WRITE:
     df_energy_output.to_csv('total_energy.csv', sep=',')
     df_energy_output.to_excel(writer, sheet_name="total_energy")
 
-    # Initialise necessary dataframes
-    df_final = pd.DataFrame()
-    df_xc_sorted = pd.DataFrame()
-    df_cl_sorted = pd.DataFrame()
-    df_dispersion_sorted = pd.DataFrame()
-    df_intra_sorted = pd.DataFrame()
-    df_ct_pl_sorted = pd.DataFrame()
-    df_inter_full_sorted = pd.DataFrame()
+    # INTER AND INTRA PROPERTIES RE-ARRANGEMENT
+    list_property_final = []
+    final_properties_comparison = []
     for i in range(len(reg_inter[0])):
-        # INTER-ATOMIC ENERGY DATAFRAME
-        temp = [reg_inter[0][i], reg_inter[1][i]]
-        df_inter = pd.DataFrame(temp).transpose()
-        df_inter.columns = ["REG", "R"]
-        df_inter.index = iqa_inter_header
-        df_inter.sort_values('REG').to_csv("Inter_seg_" + str(i + 1) + ".csv", sep=',')
-        df_inter.sort_values('REG').to_excel(writer, sheet_name="Inter_seg_" + str(i + 1))
-        df_inter = df_inter.rename_axis('TERM').reset_index()
+        list_property_sorted = []
+        properties_comparison = []
+        df_inter = rv.create_term_dataframe(reg_inter, iqa_inter_header,i)
+        df_intra = rv.create_term_dataframe(reg_intra, iqa_intra_header, i)
+        for j in range(len(inter_prop)):
+            df_property = rv.filter_term_dataframe(df_inter, inter_prop[j], inter_prop_names[j])
+            if j <= 1:
+                properties_comparison.append(df_property)
+            df_property.to_csv(inter_prop_names[j] + "_seg_" + str(i + 1) + ".csv", sep=',')
+            df_property.to_excel(writer, sheet_name=inter_prop_names[j] + "_seg_" + str(i + 1))
+            list_property_sorted.append(
+                pd.concat([df_property[-n_terms:], df_property[:n_terms]], axis=0).sort_values('REG'))
+        for j in range(len(intra_prop)):
+            df_property = rv.filter_term_dataframe(df_intra, intra_prop[j], intra_prop_names[j])
+            if j == 0:
+                properties_comparison.append(df_property)
+            df_property.to_csv(intra_prop_names[j] + "_seg_" + str(i + 1) + ".csv", sep=',')
+            df_property.to_excel(writer, sheet_name=intra_prop_names[j] + "_seg_" + str(i + 1))
+            list_property_sorted.append(pd.concat([df_property], axis=0).sort_values('REG'))
+        list_property_final.append(list_property_sorted)
+        final_properties_comparison.append(properties_comparison)
 
-        # INTRA-ATOMIC ENERGY DATAFRAME
-        temp = [reg_intra[0][i], reg_intra[1][i]]
-        df_intra = pd.DataFrame(temp).transpose()
-        df_intra.columns = ["REG", "R"]
-        df_intra.index = iqa_intra_header
-        df_intra.sort_values('REG').to_csv("E_Intra_seg_" + str(i + 1) + ".csv", sep=',')
-        df_intra.sort_values('REG').to_excel(writer, sheet_name="E_Intra_seg_" + str(i + 1))
-        df_intra = df_intra.rename_axis('TERM').reset_index()
-
-        # DISPERTION ENERGY DATAFRAME
-        if DISPERSION:
-            temp = [reg_disp[0][i], reg_disp[1][i]]
-            df_disp = pd.DataFrame(temp).transpose()
-            df_disp.columns = ["REG", "R"]
-            df_disp.index = iqa_disp_header
-            df_disp.sort_values('REG').to_csv("Disp_seg_" + str(i + 1) + ".csv", sep=',')
-            df_disp.sort_values('REG').to_excel(writer, sheet_name="Disp_seg_" + str(i + 1))
-            df_disp = df_disp.rename_axis('TERM').reset_index()
-            df_disp.dropna(axis=0, how='any', subset=None,
-                           inplace=True)  # get rid of "NaN" terms which have a null REG Value
-
-            df_disp = df_disp.sort_values('REG').reset_index(drop=True)
-            df_disp['TERM'] = df_disp['TERM'].str.replace("E_Disp\(A,B\)-", 'Vdisp(')
-            df_disp['TERM'] = df_disp['TERM'].str.replace("_", ',')
-            df_disp['TERM'] = df_disp['TERM'] + ')'
-            df_dispersion_sorted = pd.concat([df_dispersion_sorted.reset_index(drop=True),
-                                              pd.concat([df_disp[-n_terms:], df_disp[:n_terms]], axis=0).sort_values(
-                                                  'REG').reset_index(drop=True)], axis=1)
-
-        if CHARGE_TRANSFER_POLARISATION:
-            # POLARISATION ENERGY DATAFRAME
-            temp = [reg_pl[0][i], reg_pl[1][i]]
-            df_pl = pd.DataFrame(temp).transpose()
-            df_pl.columns = ["REG", "R"]
-            df_pl.index = iqa_polarisation_headers
-            df_pl.sort_values('REG').to_csv("Vpl_seg_" + str(i + 1) + ".csv", sep=',')
-            df_pl.sort_values('REG').to_excel(writer, sheet_name="Vpl_seg_" + str(i + 1))
-            df_pl = df_pl.rename_axis('TERM').reset_index()
-
-            # CHARGE-TRANSFER ENERGY DATAFRAME
-            temp = [reg_ct[0][i], reg_ct[1][i]]
-            df_ct = pd.DataFrame(temp).transpose()
-            df_ct.columns = ["REG", "R"]
-            df_ct.index = iqa_charge_transfer_headers
-            df_ct.sort_values('REG').to_csv("Vct_seg_" + str(i + 1) + ".csv", sep=',')
-            df_ct.sort_values('REG').to_excel(writer, sheet_name="Vct_seg_" + str(i + 1))
-            df_ct = df_ct.rename_axis('TERM').reset_index()
-
-            df_temp_ct_pl = pd.concat([df_pl, df_ct]).sort_values('REG').reset_index(drop=True)
-
-            df_ct_pl_sorted = pd.concat([df_ct_pl_sorted, pd.concat([df_temp_ct_pl[-n_terms:], df_temp_ct_pl[:n_terms]],
-                                                                    axis=0).sort_values('REG')], axis=1)
-
-        # FULL INTER-ATOMIC ENERGY DATAFRAME
-        temp = [reg_inter_full[0][i], reg_inter_full[1][i]]
-        df_inter_full = pd.DataFrame(temp).transpose()
-        df_inter_full.columns = ["REG", "R"]
-        df_inter_full.index = E_iqa_inter_headers
-        df_inter_full.sort_values('REG').to_csv("E_full_inter_seg_" + str(i + 1) + ".csv", sep=',')
-        df_inter_full.sort_values('REG').to_excel(writer, sheet_name="E_full_inter_seg_" + str(i + 1))
-        df_inter_full = df_inter_full.rename_axis('TERM').reset_index()
-
-        df_inter_full = df_inter_full.sort_values('REG').reset_index(drop=True)
-        df_inter_full_sorted = pd.concat([df_inter_full_sorted,
-                                          pd.concat([df_inter_full[-n_terms:], df_inter_full[:n_terms]],
-                                                    axis=0).sort_values('REG')], axis=1)
-
-        # TEMPORARY DATAFRAME FOR ALL CONTRIBUTIONS MAIN CONTRIBUTIONS
-        if DISPERSION:
-            df_temp = pd.concat([df_intra, df_inter, df_disp]).sort_values('REG').reset_index(drop=True)
-        else:
-            df_temp = pd.concat([df_intra, df_inter]).sort_values('REG').reset_index(drop=True)
-        df_temp['TERM'] = df_temp['TERM'].str.replace("VC_IQA\(A,B\)-", 'Vcl(')
-        df_temp['TERM'] = df_temp['TERM'].str.replace("VX_IQA\(A,B\)-", 'Vxc(')
-        df_temp['TERM'] = df_temp['TERM'].str.replace("E_IQA_Intra\(A\)-", 'Eintra(')
-        df_temp['TERM'] = df_temp['TERM'].str.replace("_", ',')
-        df_temp['TERM'] = df_temp['TERM'] + ')'
-        dataframe_list.append(df_temp)
-
-        # FILTERCONTRIBUTIONS: Vxc
-        col = ['TERM', 'REG', 'R']
-        df_xc = pd.DataFrame()
-        for j in range(0, len(df_inter['TERM'])):
-            if 'VX_IQA' in df_inter['TERM'][j]:
-                df_xc = df_xc.append(df_inter.iloc[j])
-        df_xc = df_xc[col]
-        df_xc = df_xc.sort_values('REG').reset_index(drop=True)
-        df_xc['TERM'] = df_xc['TERM'].str.replace("VX_IQA\(A,B\)-", 'Vxc(')
-        df_xc['TERM'] = df_xc['TERM'].str.replace("_", ',')
-        df_xc['TERM'] = df_xc['TERM'] + ')'
-
-        df_xc.to_csv("Vxc_seg_" + str(i + 1) + ".csv", sep=',')
-        df_xc.to_excel(writer, sheet_name="Vxc_seg_" + str(i + 1))
-        df_xc_sorted = pd.concat(
-            [df_xc_sorted, pd.concat([df_xc[-n_terms:], df_xc[:n_terms]], axis=0).sort_values('REG')], axis=1)
-
-        # FILTER CONTRIBUTIONS: Vcl
-
-        df_cl = pd.DataFrame()
-        for j in range(0, len(df_inter['TERM'])):
-            if 'VC_IQA' in df_inter['TERM'][j]:
-                df_cl = df_cl.append(df_inter.iloc[j])
-        df_cl = df_cl[col]
-        df_cl = df_cl.sort_values('REG').reset_index(drop=True)
-        df_cl['TERM'] = df_cl['TERM'].str.replace("VC_IQA\(A,B\)-", 'Vcl(')
-        df_cl['TERM'] = df_cl['TERM'].str.replace("_", ',')
-        df_cl['TERM'] = df_cl['TERM'] + ')'
-        df_cl.to_csv("Vcl_seg_" + str(i + 1) + ".csv", sep=',')
-        df_cl.to_excel(writer, sheet_name="Vcl_seg_" + str(i + 1))
-        df_cl_sorted = pd.concat(
-            [df_cl_sorted, pd.concat([df_cl[-n_terms:], df_cl[:n_terms]], axis=0).sort_values('REG')], axis=1)
-
-        # FILTER CONTRIBUTIONS: Eintra
-        df_intra = df_intra.sort_values('REG').reset_index(drop=True)
-        df_intra['TERM'] = df_intra['TERM'].str.replace("E_IQA_Intra\(A\)-", 'Eintra(')
-        df_intra['TERM'] = df_intra['TERM'].str.replace("_", ',')
-        df_intra['TERM'] = df_intra['TERM'] + ')'
-        if len(atoms) > n_terms:
-            df_intra_sorted = pd.concat(
-                [df_intra_sorted, pd.concat([df_intra[-n_terms:], df_intra[:n_terms]], axis=0).sort_values('REG')],
-                axis=1)
-        else:
-            df_intra_sorted = pd.concat([df_intra_sorted, pd.concat([df_intra], axis=0).sort_values('REG')], axis=1)
-
-        df_final = pd.concat([
-            df_final.reset_index(drop=True),
-            pd.concat([df_temp[-n_terms:], df_temp[:n_terms]], axis=0).sort_values('REG').reset_index(drop=True)],
-            axis=1, )
-
-    # SAVE .csv files and tables .png
-    df_final.to_csv('IQA_segment_analysis.csv', sep=',')
-    df_final.to_excel(writer, sheet_name='REG_final')
-    rv.pandas_REG_dataframe_to_table(df_final, 'REG_final_table', SAVE_FIG=SAVE_FIG)
-    df_cl_sorted.to_csv('IQA_segment_Vcl_analysis.csv', sep=',')
-    df_cl_sorted.to_excel(writer, sheet_name='REG_Vcl')
-    rv.pandas_REG_dataframe_to_table(df_cl_sorted, 'REG_Vcl_table', SAVE_FIG=SAVE_FIG)
-    df_xc_sorted.to_csv('IQA_segment_Vxc_analysis.csv', sep=',')
-    df_xc_sorted.to_excel(writer, sheet_name='REG_Vxc')
-    rv.pandas_REG_dataframe_to_table(df_xc_sorted, 'REG_Vxc_table', SAVE_FIG=SAVE_FIG)
-    df_intra_sorted.to_csv('IQA_segment_Eintra_analysis.csv', sep=',')
-    df_intra_sorted.to_excel(writer, sheet_name='REG_Eintra')
-    rv.pandas_REG_dataframe_to_table(df_intra_sorted, 'REG_Eintra_table', SAVE_FIG=SAVE_FIG)
-    df_inter_full_sorted.to_csv('IQA_segment_full-inter_analysis.csv', sep=',')
-    df_inter_full_sorted.to_excel(writer, sheet_name='REG_E_inter_full')
-    rv.pandas_REG_dataframe_to_table(df_inter_full_sorted, 'REG_E_inter_full_table', SAVE_FIG=SAVE_FIG)
-    if CHARGE_TRANSFER_POLARISATION:
-        df_ct_pl_sorted.to_csv('IQA_segment_Vct-Vpl_analysis.csv')
-        df_ct_pl_sorted.to_excel(writer, sheet_name="REG_Vct-Vpl")
-        rv.pandas_REG_dataframe_to_table(df_ct_pl_sorted, 'REG_Vct-Vpl_table', SAVE_FIG=SAVE_FIG)
+    # DISPERSION OUTPUT
     if DISPERSION:
-        df_dispersion_sorted.to_csv('IQA_segment_Vdisp_analysis.csv', sep=',')
-        df_dispersion_sorted.to_excel(writer, sheet_name="REG_Vdisp")
-        rv.pandas_REG_dataframe_to_table(df_dispersion_sorted, 'REG_Vdisp_table', SAVE_FIG=SAVE_FIG)
+        df_dispersion_sorted = pd.DataFrame()
+        disp_name_old = 'E_Disp(A,B)'
+        disp_name_new = 'Vdisp'
+        for i in range(len(reg_inter[0])):
+            df_disp = rv.create_term_dataframe(reg_disp, iqa_disp_header,i)
+            df_disp_new = rv.filter_term_dataframe(df_disp, disp_name_old, disp_name_new)
+            df_disp_new.to_csv(disp_name_new + "_seg_" + str(i + 1) + ".csv", sep=',')
+            df_disp_new.to_excel(writer, sheet_name=disp_name_new + "_seg_" + str(i + 1))
+            df_disp_new.dropna(axis=0, how='any', subset=None,
+                           inplace=True)  # get rid of "NaN" terms which have a null REG Value
+            df_dispersion_sorted = pd.concat([df_dispersion_sorted.reset_index(drop=True),
+                                              pd.concat([df_disp_new[-n_terms:], df_disp_new[:n_terms]],
+                                                        axis=0).sort_values(
+                                                  'REG').reset_index(drop=True)], axis=1)
+        df_dispersion_sorted.to_csv('REG_' + disp_name_new + '_analysis.csv', sep=',')
+        df_dispersion_sorted.to_excel(writer, sheet_name="REG_" + disp_name_new)
+        rv.pandas_REG_dataframe_to_table(df_dispersion_sorted, 'REG_' + disp_name_new + '_table', SAVE_FIG=SAVE_FIG)
+
+    # CHARGE-TRANSFER and POLARISATION
+    if CHARGE_TRANSFER_POLARISATION:
+        df_ct_pl_sorted = pd.DataFrame()
+        for i in range(len(reg_inter[0])):
+            df_pl = rv.filter_term_dataframe(rv.create_term_dataframe(reg_pl, iqa_polarisation_headers,i),
+                                             'Vpl_IQA(A,B)',
+                                             'Vpl')
+            df_ct = rv.filter_term_dataframe(rv.create_term_dataframe(reg_ct, iqa_charge_transfer_headers,i),
+                                             'Vct_IQA(A,B)',
+                                             'Vct')
+            df_pl.to_csv("Vpl_seg_" + str(i + 1) + ".csv", sep=',')
+            df_pl.to_excel(writer, sheet_name="Vpl_seg_" + str(i + 1))
+            df_ct.to_csv("Vct_seg_" + str(i + 1) + ".csv", sep=',')
+            df_ct.to_excel(writer, sheet_name="Vct_seg_" + str(i + 1))
+            df_temp = pd.concat([df_pl, df_ct]).sort_values('REG').reset_index(drop=True)
+            df_ct_pl_sorted = pd.concat([df_ct_pl_sorted.reset_index(drop=True),
+                                         pd.concat([df_temp[-n_terms:], df_temp[:n_terms]], axis=0).sort_values(
+                                             'REG').reset_index(drop=True)], axis=1)
+        df_ct_pl_sorted.to_csv('REG_Vct-Vpl_analysis.csv', sep=',')
+        df_ct_pl_sorted.to_excel(writer, sheet_name='REG_Vct-Vpl')
+        rv.pandas_REG_dataframe_to_table(df_ct_pl_sorted, 'REG_Vct-Vpl_table', SAVE_FIG=SAVE_FIG)
+
+    # OUTPUT OF ALL INTER AND INTRA TERMS SELECTED BY THE USER
+    all_prop_names = inter_prop_names + intra_prop_names
+    for i in range(len(inter_prop) + len(intra_prop)):
+        df_property_sorted = pd.DataFrame()
+        for j in range(len(reg_inter[0])):
+            df_property_sorted = pd.concat([df_property_sorted, list_property_final[j][i]], axis=1)
+        df_property_sorted.to_csv('REG_' + all_prop_names[i] + '_analysis.csv', sep=',')
+        df_property_sorted.to_excel(writer, sheet_name='REG_' + all_prop_names[i])
+        rv.pandas_REG_dataframe_to_table(df_property_sorted, 'REG_' + all_prop_names[i] + '_table', SAVE_FIG=SAVE_FIG)
+
+    # FINAL COMPARISON
+    df_final_sorted = pd.DataFrame()
+    for i in range(len(reg_inter[0])):
+        df_final = pd.DataFrame()
+        for j in range(3):
+            df_final = pd.concat([df_final, final_properties_comparison[i][j]])
+        if DISPERSION:
+            df_final = pd.concat([df_final, df_disp_new])
+        dataframe_list.append(df_final)
+        df_final = df_final.sort_values('REG').reset_index(drop=True)
+        df_final_sorted = pd.concat([df_final_sorted.reset_index(drop=True),
+                                     pd.concat([df_final[-n_terms:], df_final[:n_terms]], axis=0).sort_values(
+                                         'REG').reset_index(drop=True)], axis=1)
+        df_final.to_csv('REG_full_comparison_seg_' + str(i + 1) + '.csv', sep=',')
+    df_final_sorted.to_csv('REG_final_analysis.csv', sep=',')
+    df_final_sorted.to_excel(writer, sheet_name='REG_final')
+    rv.pandas_REG_dataframe_to_table(df_final_sorted, 'REG_final_table', SAVE_FIG=SAVE_FIG)
 
     writer.save()
 
@@ -444,7 +363,8 @@ if AUTO:
 else:
     critical_points = turning_points
 
-rv.plot_segment(cc, 2625.50 * (total_energy_wfn - (sum(total_energy_wfn)/len(total_energy_wfn))), critical_points, annotate=ANNOTATE,
+rv.plot_segment(cc, 2625.50 * (total_energy_wfn - (sum(total_energy_wfn) / len(total_energy_wfn))), critical_points,
+                annotate=ANNOTATE,
                 label=LABELS,
                 y_label=r'Relative Energy [$kJ.mol^{-1}$]', x_label=X_LABEL, title=SYS,
                 save=SAVE_FIG, file_name='REG_analysis.png')

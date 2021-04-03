@@ -185,3 +185,24 @@ def pandas_REG_dataframe_to_table(dataframe, table_name, SAVE_FIG=True):
         t.auto_set_font_size(False)
         t.set_fontsize(12)
         fig.savefig(table_name, dpi=300, bbox_inches="tight")
+
+def create_term_dataframe(reg_dataframe, headers, i):
+    temp = [reg_dataframe[0][i], reg_dataframe[1][i]]
+    df = pd.DataFrame(temp).transpose()
+    df.columns = ["REG", "R"]
+    df.index = headers
+    df = df.rename_axis('TERM').reset_index()
+    return df
+
+def filter_term_dataframe(prop_dataframe, original_prop_name, new_prop_name):
+    col = ['TERM','REG','R']
+    new_df = pd.DataFrame()
+    for j in range(0, len(prop_dataframe['TERM'])):
+        if original_prop_name in prop_dataframe['TERM'][j]:
+             new_df =  new_df.append(prop_dataframe.iloc[j])
+    new_df = new_df[col]
+    new_df = new_df.sort_values('REG').reset_index(drop=True)
+    new_df['TERM'] = new_df['TERM'].apply(lambda row:row.replace(original_prop_name + '-', new_prop_name +'('))
+    new_df['TERM'] = new_df['TERM'].str.replace("_", ',')
+    new_df['TERM'] = new_df['TERM'] + ')'
+    return new_df

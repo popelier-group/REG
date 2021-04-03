@@ -339,8 +339,8 @@ def charge_transfer_and_polarisation_from_int_file(folders, atom_list, inter_pro
     # CREATE CONTRIBTUIONS LIST ARRAY
     for i in range(len(atom_list)):
         for j in range(i + 1, len(atom_list)):
-            contributions_list_PL.append('Vpl(' + atom_list[i] + ',' + atom_list[j] + ')')
-            contributions_list_CT.append('Vct(' + atom_list[i] + ',' + atom_list[j] + ')')
+            contributions_list_PL.append('Vpl_IQA(A,B)-' + atom_list[i] + '_' + atom_list[j])
+            contributions_list_CT.append('Vct_IQA(A,B)-' + atom_list[i] + '_' + atom_list[j])
 
     # READ NET-CHARGE PROPERTIES FROM .INT FILES
     for folder in folders:
@@ -389,64 +389,3 @@ def charge_transfer_and_polarisation_from_int_file(folders, atom_list, inter_pro
 
     return charge_transfer_properties, contributions_list_CT, polarisation_properties, contributions_list_PL
 
-
-def E_IQA_from_int_file(folders, atom_list):
-    """
-    ###########################################################################################################
-    FUNCTION: E_IQA_from_int_file
-              get both IQA properties from int files
-
-    INPUT:
-        folders = path to _atomicfiles folders
-        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
-
-    OUTPUT: [inter_properties, contributions_list]
-        inter_properties = array of array containing the IQA values for each atom for each geometry
-        contributions_list = list of contributions  organized in the same order as in intra_properties
-
-    ERROR:
-        "File is empty or does not exist"
-    ###########################################################################################################
-    """
-    # INTERNAL VARIABLES:
-    n = len(atom_list)
-    f = len(folders)
-    temp1 = []  # Temporary array
-    temp2 = []  # Temporary array
-
-    inter_properties = []  # Output
-    contributions_list = []  # Output
-    # CREATE CONTRIBUTIONS LIST ARRAY:
-    for i in range(len(atom_list)):
-        for j in range(i + 1, len(atom_list)):
-            contributions_list.append('E_inter(' + atom_list[i] + ',' + atom_list[j] + ')')
-    for path in folders:
-        for i in range(len(atom_list)):
-            atom1 = atom_list[i]
-            for j in range(i + 1, len(atom_list)):
-                atom2 = atom_list[j]
-                file = open(path + "/" + atom1 + "_" + atom2 + ".int", "r")
-                lines = file.readlines()
-                file.close()
-                for i in lines:
-                    if ' Energy Components (See "2EDM Note"):' in i:
-                        start = lines.index(i)
-                    elif '2EDM Note:' in i:
-                        end = lines.index(i)
-
-                if end >= len(lines):  # Checks the .int file.
-                    raise ValueError("File is empty or not exists: " + path + "/" + atom1 + "_" + atom2 + ".int")
-
-                lines = [lines[i] for i in range(start + 1, end)]
-                for line in lines:
-                    if 'E_IQA_Inter(A,B) ' in line:
-                        temp1.append(float(line.split()[-1]))
-
-    # ORGANIZE ARRAY ORDER
-    for j in range(int(n * (n - 1) / 2)):
-        temp2.append([temp1[i] for i in range(j, len(temp1), int(n * (n - 1) / 2))])
-    start = 0
-    for atom_prop in temp2:
-        inter_properties.append([atom_prop[i] for i in range(start, f)])
-
-    return inter_properties, contributions_list
