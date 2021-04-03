@@ -344,6 +344,7 @@ if WRITE:
                                      pd.concat([df_final[-n_terms:], df_final[:n_terms]], axis=0).sort_values(
                                          'REG').reset_index(drop=True)], axis=1)
         df_final.to_csv('REG_full_comparison_seg_' + str(i + 1) + '.csv', sep=',')
+        df_final.to_excel(writer, sheet_name='REG_full_comparison_seg_' + str(i+1))
     df_final_sorted.to_csv('REG_final_analysis.csv', sep=',')
     df_final_sorted.to_excel(writer, sheet_name='REG_final')
     rv.pandas_REG_dataframe_to_table(df_final_sorted, 'REG_final_table', SAVE_FIG=SAVE_FIG)
