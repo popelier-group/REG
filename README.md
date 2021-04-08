@@ -11,7 +11,7 @@ Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 To run a REG analysis (with IQA and DFT-D3):
 - Save this repository in your machine.
 - Copy the `auto_reg.py` script in the folder where each REG step has been saved. Note: Each REG step should be saved as a numbered folder and contain the gaussian single point energy output, gaussian wavefunction output and the atomic-files folder obtained with AIMAll. 
-- Enter the script, change the REG installation path and all the possible options as explained in the script
+- Enter the script, change the REG installation path and all the possible options as explained in the script.
 - Run the command : 
 `python3 auto_reg.py > reg.log &`
   
