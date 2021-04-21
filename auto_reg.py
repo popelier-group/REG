@@ -49,7 +49,7 @@ REVERSE = True  # Reverse the REG points
 INFLEX = False
 
 ### CONTROL COORDINATE OPTIONS ###
-CONTROL_COORDINATE_TYPE = 'Scan'  # 'Scan' or 'IRC'. If empty ('') then default will be used
+CONTROL_COORDINATE_TYPE = ''  # 'Scan' or 'IRC'. If empty ('') then default will be used
 Scan_Atoms = [1, 6]  # list of the atoms used for PES Scan (i.e. ModRedundant option in Gaussian)
 IRC_output = ''  # insert the g16 output file path if using IRC as control coordinate
 
