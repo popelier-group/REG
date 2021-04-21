@@ -15,7 +15,7 @@ def set_axis_style(ax, labels):
 def plot_violin(file_list=[], save = False, file_name='reg_violin.png'):
     labels = [i+1 for i in range(len(file_list))]
     fig=plt.figure()
-    fig.suptitle(r'Distribution of $R^2$ in each segment')
+    fig.suptitle(r'Distribution of $R$ in each segment')
     ax = fig.add_subplot(111)
     ax.violinplot(file_list, showmeans='True')
     set_axis_style(ax, labels)
@@ -50,35 +50,33 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
             parts['bodies'][i].set_edgecolor('green')
     ax1.set_xlabel('Segments')
     ax1.grid(axis='y', alpha=0.75)
-    ax1.set_title(r'Distribution of $R^2$')
+    ax1.set_title(r'Distribution of $R$')
 
 
 
 ##histogram plot
-    ax2.hist(file['R'], bins=[0.1*i for i in range(0,11,1)], 
+    ax2.hist(file['R'], bins=[0.1*i for i in range(-11,11,1)],
              density=0 , color = 'green', edgecolor='black', linewidth=1.2, alpha=0.4)
     ax2.grid(axis='y', alpha=0.75)
     ax2.grid(axis='x', alpha=0.75)
-    ax2.set_xlim(0,1)
-    ax2.xaxis.set_ticks(np.arange(0, 1.1, 0.1))
+    ax2.set_xlim(-1,1)
+    ax2.xaxis.set_ticks(np.arange(-1.0, 1.1, 0.1))
     ax2.xaxis.set_ticks_position('top')
     ax2.xaxis.set_label_position('top')
     ax2.set_ylabel('Count Number')
-    ax2.set_xlabel(r'$R^2$')
+    ax2.set_xlabel(r'$R$')
     ax2.yaxis.set_ticks_position('right')
-    ax2.axvline(mu, ls='--', color='r')
-
+    #ax2.axvline(mu, ls='--', color='r')
 
 ##stem plot1
-    ax3.set_xlim(0, 1)
+    ax3.set_xlim(-1, 1)
     ax3.stem(file['R'], file['REG'],'k', markerfmt=' ', use_line_collection ='True')
     ax3.grid(axis='x', alpha=0.75)
     ax3.set_ylabel('REG value')
-    ax3.xaxis.set_ticks(np.arange(0, 1.1, 0.1))
+    ax3.xaxis.set_ticks(np.arange(-1.0, 1.1, 0.1))
     ax3.yaxis.set_ticks([])
-    ax3.set_xlabel(r'$R^2$')
-    ax3.axvline(mu, ls='--', color='r')
-
+    ax3.set_xlabel(r'$R$')
+    #ax3.axvline(mu, ls='--', color='r')
 ##Stem plot2
     pos = pd.DataFrame(columns=file.columns)
     neg = pd.DataFrame(columns=file.columns)    
@@ -94,22 +92,22 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
     markerline2, stemlines2, baseline2 = ax4.stem(neg['R'], neg['REG'], 'r', use_line_collection ='True')
     markerline2.set_markerfacecolor('r')
     markerline2.set_markeredgecolor('r')    
-    ax4.set_xlim(mu, max(file['R']))
+    ax4.set_xlim(-1, 1)
     bbox_props = dict(boxstyle="round,pad=0.1", fc="w", ec="k", lw=0, alpha=0.8)
-    cond = pos.R > mu
+    cond = pos.R > 0
     temp = pos.loc[cond,:]
     n = temp.nlargest(n_term, 'REG').reset_index(drop=True)  
-    text_p = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]       
+    text_p = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]
     adjust_text(text_p, arrowprops=dict(arrowstyle='->', color='black', lw=1.5)) 
 
-    cond = neg.R > mu
+    cond = neg.R < 0
     temp = neg.loc[cond,:]
     n = temp.nsmallest(n_term, 'REG').reset_index(drop=True)  
-    text_n = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]         
+    text_n = [ax4.text(n['R'][i], n['REG'][i], n['TERM'][i], bbox=bbox_props) for i in range(len(n))]
     adjust_text(text_n, arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
 
     ax4.set_title('Relevant IQA contributions')
-    ax4.set_xlabel(r'$R^2$')
+    ax4.set_xlabel(r'$R$')
     ax4.set_ylabel('REG value')
     
     if save == True:
@@ -117,7 +115,7 @@ def generate_data_vis(file, file_list, n_term, save = False, file_name='data_vis
     
     return
 
-def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=True, annotate=True, 
+def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=True, annotate=True,
                  title='REG segments', y_label='Energy', x_label='Coordinate', save =False, file_name='segments.png'):
         
     color_list=['blue', 'darkgreen', 'darkred', 'yellow', 'cyan', 'magenta', 'grey', 'salmon',
@@ -125,10 +123,11 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
 
     fig = plt.figure(figsize=(12,5))
     graph = plt.subplot(111)
-    graph.plot(coordinate, wfn_energy, 'o', color='black')
+    graph.plot(coordinate,wfn_energy,'o', color='black')
     if label == True:
         for i in range(len(wfn_energy)):
-            graph.annotate(str(i), [coordinate[i], wfn_energy[i]])
+            graph.annotate(str(i+1), [coordinate[i], wfn_energy[i]])
+
     
     graph.xaxis.set_major_locator(MultipleLocator(2*abs(coordinate[0]-coordinate[1])))
     graph.xaxis.set_minor_locator(MultipleLocator(abs(coordinate[0]-coordinate[1])))    
@@ -175,4 +174,35 @@ def plot_segment(coordinate, wfn_energy, critical_points, label=False, color=Tru
 
     return
     
+def pandas_REG_dataframe_to_table(dataframe, table_name, SAVE_FIG=True):
+    if SAVE_FIG==True:
+        dataframe['R'] = np.round(dataframe['R'], decimals=3)
+        dataframe['REG'] = np.round(dataframe['REG'], decimals=2)
+        fig, ax = plt.subplots()
+        ax.axis('off')
+        ax.axis('tight')
+        t= ax.table(cellText=dataframe.values, colWidths = [0.4]*len(dataframe.columns),  colLabels=dataframe.columns,  cellLoc='center',loc='center')
+        t.auto_set_font_size(False)
+        t.set_fontsize(12)
+        fig.savefig(table_name, dpi=300, bbox_inches="tight")
 
+def create_term_dataframe(reg_dataframe, headers, i):
+    temp = [reg_dataframe[0][i], reg_dataframe[1][i]]
+    df = pd.DataFrame(temp).transpose()
+    df.columns = ["REG", "R"]
+    df.index = headers
+    df = df.rename_axis('TERM').reset_index()
+    return df
+
+def filter_term_dataframe(prop_dataframe, original_prop_name, new_prop_name):
+    col = ['TERM','REG','R']
+    new_df = pd.DataFrame()
+    for j in range(0, len(prop_dataframe['TERM'])):
+        if original_prop_name in prop_dataframe['TERM'][j]:
+             new_df =  new_df.append(prop_dataframe.iloc[j])
+    new_df = new_df[col]
+    new_df = new_df.sort_values('REG').reset_index(drop=True)
+    new_df['TERM'] = new_df['TERM'].apply(lambda row:row.replace(original_prop_name + '-', new_prop_name +'('))
+    new_df['TERM'] = new_df['TERM'].str.replace("_", ',')
+    new_df['TERM'] = new_df['TERM'] + ')'
+    return new_df
