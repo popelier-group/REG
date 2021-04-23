@@ -18,7 +18,7 @@ Minimum requirements:
 
 To run a REG analysis (with IQA and DFT-D3):
 - Save this repository in your machine.
-- Copy the `auto_reg.py` script in the folder where each REG step has been saved. Note: Each REG step should be saved as a numbered folder and contain the gaussian single point energy output, gaussian wavefunction output and the atomic-files folder obtained with AIMAll. 
+- Copy the `auto_reg.py` script in the folder where each REG step has been saved. Note: Each REG step should be saved as a numbered folder and contain the gaussian single point energy output, gaussian wavefunction output and the atomic-files folder obtained with AIMAll [[3]](#3). 
 - Enter the script, change the REG installation path and all the possible options as explained in the script.
 - Run the command : 
 `python3 auto_reg.py > reg.log &`
@@ -34,3 +34,6 @@ Thacker, Joseph CR, and Paul LA Popelier. "The ANANKE relative energy gradient (
 
 <a id="2">[2]</a> 
 Douglas, D.H. and T.K. Peucker, Algorithms for the reduction of the number of points required to represent a digitized line or its caricature. Cartographica: the international journal for geographic information and geovisualization, 1973. 10(2): p. 112-122.
+
+<a id="3">[3]</a> 
+ AIMAll (Version 19.10.12), Todd A. Keith, TK Gristmill Software, Overland Park KS, USA, 2019 (aim.tkgristmill.com)
