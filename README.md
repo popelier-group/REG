@@ -11,7 +11,7 @@ Run the command
  `python3 setup_rdp.py -h (or --help)`
  for the usage. 
  
-Minimum requires:
+Minimum requirements:
  -  A txt file containing the energies at each step of an IRC or PES scan (easily obtained in GaussView).
 # Usage
 ***Manual is not up to date but still useful for tips and tricks***
