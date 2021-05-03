@@ -1,5 +1,14 @@
-import sys
-sys.path.insert(1, 'C:/Users/fabio/REG')
+"""
+setup_rdp.py v0.1
+F. Falcioni, P. L. A. Popelier
+
+Script with the function to run the Ramer-Douglas-Peucker algorithm to potential energy surfaces.
+
+Check for updates at github.com/FabioFalcioni
+
+Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
+coded by F.Falcioni
+"""
 import reg
 import numpy as np
 import matplotlib.pyplot as plt

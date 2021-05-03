@@ -243,10 +243,11 @@ dataframe_list = []
 if WRITE:
     # initialise excel file
     writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
-    # ENERGY ONLY .CSV FILES
+    # ENERGY and CONTROL  COORDINATE ONLY .CSV FILES
     df_energy_output = pd.DataFrame()
     df_energy_output['WFN'] = total_energy_wfn
     df_energy_output['IQA'] = total_energy_iqa
+    df_energy_output.index = cc
     if DISPERSION:
         df_energy_output['D3'] = total_energy_dispersion
     df_energy_output.to_csv('total_energy.csv', sep=',')
