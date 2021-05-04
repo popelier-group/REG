@@ -330,7 +330,7 @@ if WRITE:
         pd.DataFrame(
             data=np.concatenate((np.array(iqa_polarisation_terms), np.array(iqa_charge_transfer_terms))).transpose(),
             columns=np.concatenate((iqa_polarisation_headers, iqa_charge_transfer_headers))).to_excel(energy_writer,
-                                                                                                      sheet_name='polarisation-charge_transfer_energies')
+                                                                                                      sheet_name='pl_ct_energies')
 
     # OUTPUT OF ALL INTER AND INTRA TERMS SELECTED BY THE USER
     all_prop_names = inter_prop_names + intra_prop_names
