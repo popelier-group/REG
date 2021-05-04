@@ -243,7 +243,8 @@ dataframe_list = []
 if WRITE:
     # initialise excel file
     writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
-    # ENERGY and CONTROL  COORDINATE ONLY .CSV FILES
+    energy_writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/Energy.xlsx", engine='xlsxwriter')
+    # ENERGY and CONTROL  COORDINATE ONLY FILES
     df_energy_output = pd.DataFrame()
     df_energy_output['WFN'] = total_energy_wfn
     df_energy_output['IQA'] = total_energy_iqa
@@ -251,7 +252,13 @@ if WRITE:
     if DISPERSION:
         df_energy_output['D3'] = total_energy_dispersion
     df_energy_output.to_csv('total_energy.csv', sep=',')
-    df_energy_output.to_excel(writer, sheet_name="total_energy")
+    df_energy_output.to_excel(energy_writer, sheet_name="total_energies")
+
+    pd.DataFrame(data=np.array(iqa_intra).transpose(), columns=iqa_intra_header).to_excel(energy_writer,
+                                                                                          sheet_name='intra-atomic_energies')
+    pd.DataFrame(data=np.array(iqa_inter).transpose(), columns=iqa_inter_header).to_excel(energy_writer,
+                                                                                          sheet_name='inter-atomic_energies')
+
 
     # INTER AND INTRA PROPERTIES RE-ARRANGEMENT
     list_property_final = []
@@ -298,7 +305,7 @@ if WRITE:
         df_dispersion_sorted.to_csv('REG_' + disp_name_new + '_analysis.csv', sep=',')
         df_dispersion_sorted.to_excel(writer, sheet_name="REG_" + disp_name_new)
         rv.pandas_REG_dataframe_to_table(df_dispersion_sorted, 'REG_' + disp_name_new + '_table', SAVE_FIG=SAVE_FIG)
-
+        pd.DataFrame(data = np.array(iqa_disp).transpose(), columns=iqa_disp_header).to_excel(energy_writer, sheet_name='dispersion_energies')
     # CHARGE-TRANSFER and POLARISATION
     if CHARGE_TRANSFER_POLARISATION:
         df_ct_pl_sorted = pd.DataFrame()
@@ -320,6 +327,10 @@ if WRITE:
         df_ct_pl_sorted.to_csv('REG_Vct-Vpl_analysis.csv', sep=',')
         df_ct_pl_sorted.to_excel(writer, sheet_name='REG_Vct-Vpl')
         rv.pandas_REG_dataframe_to_table(df_ct_pl_sorted, 'REG_Vct-Vpl_table', SAVE_FIG=SAVE_FIG)
+        pd.DataFrame(
+            data=np.concatenate((np.array(iqa_polarisation_terms), np.array(iqa_charge_transfer_terms))).transpose(),
+            columns=np.concatenate((iqa_polarisation_headers, iqa_charge_transfer_headers))).to_excel(energy_writer,
+                                                                                                      sheet_name='polarisation-charge_transfer_energies')
 
     # OUTPUT OF ALL INTER AND INTRA TERMS SELECTED BY THE USER
     all_prop_names = inter_prop_names + intra_prop_names
@@ -351,7 +362,7 @@ if WRITE:
     rv.pandas_REG_dataframe_to_table(df_final_sorted, 'REG_final_table', SAVE_FIG=SAVE_FIG)
 
     writer.save()
-
+    energy_writer.save()
     rv.plot_violin([dataframe_list[i]['R'] for i in range(len(reg_inter[0]))], save=SAVE_FIG,
                    file_name='violin.png')  # Violing plot of R vs Segments
 
