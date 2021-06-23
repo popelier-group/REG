@@ -17,12 +17,7 @@ from optparse import OptionParser
 
 def get_energies_from_file(file, file_type):
     '''
-    :param file:
-        sys.argv[0] = user input
-    :param file_type:
-        "text" = file obtained directly from GaussView
-        "grep" = files obtained by running 'grep' on the gaussian output file
-    :return: array of energies
+    Function to parse .txt files containing energies at each step of a PES
     '''
     energies = []
     if file_type == "txt":
@@ -39,6 +34,9 @@ def get_energies_from_file(file, file_type):
 
 
 def find_point_between_two_points(start, end, value):
+    '''
+    Function to find the y value of a point between two other points of a function given its x value (i.e. interpolation)
+    '''
     slope = slope_intercept(start[0], start[1], end[0], end[1])
     intercept = start[1] - slope * start[0]
     y = slope * value + intercept
@@ -46,11 +44,17 @@ def find_point_between_two_points(start, end, value):
 
 
 def slope_intercept(x1, y1, x2, y2):
+    '''
+    Function to find the slope and intercept of a line between two points
+    '''
     a = (y2 - y1) / (x2 - x1)
     return a
 
 
 def deviation(point, start, end):
+    '''
+    Function to calculate the perpendicular distance of a point from the line defined by other two points.
+    '''
     if np.all(np.equal(start, end)):
         return np.linalg.norm(point - start)
 
@@ -60,6 +64,9 @@ def deviation(point, start, end):
 
 
 def rdp_rec(M, epsilon, pdist=deviation):
+    '''
+    Function to run the RDP algorithm recursively
+    '''
     max_dist = 0.0
     index = -1
 
@@ -87,6 +94,9 @@ def rdp(M, epsilon=0, pdist=deviation):
 
 
 def find_maximum_deviation(M, pdist=deviation):
+    '''
+    Function to calculate the maximum perpendicular distance from the line defined between the extreme points of a segment
+    '''
     max_dist = 0.0
     index = -1
 
@@ -100,6 +110,9 @@ def find_maximum_deviation(M, pdist=deviation):
 
 
 def rmse(true_value, predicted_value):
+    '''
+    Function to calculate the Root-Mean-Squared-Error between true and predicted values
+    '''
     if len(true_value) != len(predicted_value):  ## Checks if X and Y have the same size
         raise ValueError("Arrays must have the same size")
     error = [true_value[i] - predicted_value[i] for i in range(len(true_value))]
@@ -109,6 +122,9 @@ def rmse(true_value, predicted_value):
 
 
 def minimum_points_segment_RDP(energy, cc, epsilon):
+    '''
+    Function to obtain a segment (or function) with the minimum amount of points given a specific value of epsilon (i.e. deviation)
+    '''
     vector = []
     x = []
     y = []
@@ -137,6 +153,10 @@ def minimum_points_segment_RDP(energy, cc, epsilon):
 
 
 def cross_validation_RDP(energy, cc, rmse_confidence=1, step_size=0.01):
+    '''
+    Function to run the RDP algorithm X times (depending on step_size) at different values of epsilon and obtain
+    obtain a function with lowest number of points at that (or below) RMSE of confidence.
+    '''
     new_vector = []
     [new_vector.append((cc[i], energy[i])) for i in range(0, len(energy))]
     max_epsilon = find_maximum_deviation(np.array(new_vector), pdist=deviation)
@@ -156,6 +176,7 @@ def cross_validation_RDP(energy, cc, rmse_confidence=1, step_size=0.01):
 
 
 def main():
+    #Parsing USER INPUT
     global segments, cc_new
     usage = "usage: %prog [options] arg"
     parser = OptionParser(usage)
@@ -170,9 +191,10 @@ def main():
     print(
         "RDP setup: searching for a new polyline with RMSE of confidence {} kJ/mol ...".format(option.rmse_confidence))
     wfn_energies = get_energies_from_file(option.file, file_type='txt')
-    wfn_energies = np.array(wfn_energies) * 2625.5
+    wfn_energies = np.array(wfn_energies) * 2625.5 #Converting in kJ/mol from a.u.
     cc = np.array([i for i in range(1, len(wfn_energies) + 1)])
 
+    # Search for critical points in the function
     if option.critical_points == 'AUTO':
         tp = reg.find_critical(wfn_energies, cc, use_inflex=False, min_points=5)
         segments = reg.split_segm(wfn_energies - sum(wfn_energies) / len(wfn_energies), tp)
@@ -186,6 +208,7 @@ def main():
         segments = [wfn_energies - sum(wfn_energies) / len(wfn_energies)]
         cc_new = [cc]
 
+    #Creating a figure with the new polyline given the USER input rmse of confidence
     plt.rcParams.update({'font.size': 12})
     fig = plt.figure(figsize=( 9,5))
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
@@ -203,7 +226,6 @@ def main():
     plt.ylabel(r'Relative Energy (kJ $\mathrm{mol^{-1}}$)')
     plt.show()
     fig.savefig('RDP_out.png', dpi=300, bbox_inches='tight')
-
 
 if __name__ == "__main__":
     main()
