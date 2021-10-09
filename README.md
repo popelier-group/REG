@@ -14,7 +14,7 @@ Run the command
 Minimum requirements:
  -  A txt file containing the energies at each step of an IRC or PES scan (easily obtained in GaussView).
 # Usage
-***Manual is not up to date but still useful for tips and tricks***
+***Manual has been update with a full tutorial. Functions section needs to be updates***
 
 To run a REG analysis (with IQA and DFT-D3):
 - Save this repository in your machine.
