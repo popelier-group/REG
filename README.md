@@ -1,7 +1,7 @@
 # REG.py
 This repository is a continuation of the development of the Relative Energy Gradient (REG) method [[1]](#1) implemented in python3.
 
-The manual.pdf contains the information regarding the theory and the code implementation. 
+The manual.pdf contains the information regarding the theory and the code implementation plus a full walk-through tutorial on a simple system.  
 
 Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 # Setup
