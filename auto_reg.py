@@ -79,9 +79,7 @@ n_terms = 4  # number of terms to rank in figures and tables
 
 # DEFINE PATHS AND FILES AUTOMATICALLY:
 cwd = str(os.getcwd())
-
 wfn_filelist = []
-
 # Get wfn files
 for k in os.walk(r"%s" % cwd):
     for i in range(0, len(k), 1):
@@ -98,9 +96,7 @@ for root, dirs, allfiles in os.walk(r'%s' % cwd):
         folderlist.append(folder)
         i = i + 1
 
-# Sort to ensure order
-folderlist = sorted(folderlist)
-wfn_filelist = sorted(wfn_filelist)
+
 
 # Find all the g16 single point energy files
 # NOTE: this works if the output files end with ".out"
@@ -121,8 +117,17 @@ for i in range(0, len(folderlist)):
             j = j + 1
     except:
         pass
-reg_folders.sort(key=lambda f: int(re.sub('\D', '', f)))
 
+#Try to sort by number if folders are mainly written with numbers files
+try:
+    folderlist.sort(key=lambda f: int(re.sub('\D', '', f)))
+    wfn_filelist.sort(key=lambda f: int(re.sub('\D', '', f)))
+    g16_out_file.sort(key=lambda f: int(re.sub('\D', '', f)))  
+except:
+    #Except sort simply by name
+    folderlist = sorted(folderlist)
+    wfn_filelist = sorted(wfn_filelist)
+reg_folders.sort(key=lambda f: int(re.sub('\D', '', f)))
 if REVERSE:
     reg_folders = reg_folders[::-1]
 
