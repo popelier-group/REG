@@ -4,6 +4,9 @@ This repository is a continuation of the development of the Relative Energy Grad
 The manual.pdf contains the information regarding the theory and the code implementation plus a full walk-through tutorial on a simple system.  
 
 Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
+# Dependencies
+- [AdjustText](https://github.com/Phlya/adjustText)
+- [xlsxwriter](https://github.com/jmcnamara/XlsxWriter)
 # Setup
 The `setup_rdp.py` is a standalone script that can be run with specific options to find the suitable number of points on which to run the following REG-IQA analysis.
 It uses the Ramer-Douglas-Peucker algorithm [[2]](#2) on the PES obtained from electronic structure calculations. 
