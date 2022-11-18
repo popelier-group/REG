@@ -1,40 +1,18 @@
 """
-reg.py v0.0
-L. J. Duarte, XXXXXX, P. L. A. Popelier 
+reg.py v0.1
+F. Falcioni, L. J. Duarte, P. L. A. Popelier 
 
 Library with function to perform the IQA REG analysis. 
-Check for updates at github.com/ljduarte
-For details about the method, please see XXXXXXX
-
-Please, report bugs and issues to leo.j.duarte@hotmail.com.br
-coded by L. J. Duarte
+Check for updates at github.com/FabioFalcioni
 """
+from typing import List
 
+def regression(A : List[float], B : List[float], mode=None) -> List[float,float,float]: 
+    """regression performs an ordinary least squares regression between two vectors
 
-
-def regression(A, B, mode=None):
-    """
-    ###########################################################################################################
-    FUNCTION: regression
-              Perform a linear regression between A and B (B = slope*A + intercept)
-
-    INPUT: A, B and mode
-        A = X values
-        B = Y values
-        mode = None (default) : for regular linear regression
-               "norm"         : use normalized values of A and B
-               "std"          : use standardized values for A and B
-
-    OUTPUT: [slope, intercept, person]
-        slope     : angular coefficient of the linear regression
-        intercept : linear coefficient of the linear regression
-        pearson    : Pearson correlation coefficient
-
-    ERROR:
-        "Arrays must have the same size" : A and B have different sizes.
-        "Mode not recognized. Use None, 'norm' or, 'std'" : invalid value for 'mode'
-    ###########################################################################################################
-    """
+    :return: slope , intercept and pearson correlation coefficient
+    :rtype: List[float,float,float]
+    """    
     #ERRORS:  
     if len(A) != len(B): #Checks if A and B have the same size
         return ValueError("Arrays must have the same size") 
@@ -71,7 +49,7 @@ def regression(A, B, mode=None):
 
 
 
-def find_critical(Y,X, min_points=3, use_inflex=False):
+def find_critical(Y : List[float],X : List[float], min_points=3, use_inflex=False) -> List[int]:
     """
     ###########################################################################################################
     FUNCTION: find_critical
@@ -94,6 +72,12 @@ def find_critical(Y,X, min_points=3, use_inflex=False):
         "Too many points between two critical points" : min_points must be lower than the X array length
     ###########################################################################################################
     """
+    """find_critical finds the critical points (maximum,minimum,inflex) given the X, Y values of a linear function.
+    Uses a minimum amount of points between two critical points.
+
+    :return: list of critical points along a function
+    :rtype: List[int]
+    """     
     #ERRORS:  
     if len(Y) != len(X): ## Checks if X and Y have the same size
         raise ValueError("Arrays must have the same size") 
@@ -167,31 +151,21 @@ def find_critical(Y,X, min_points=3, use_inflex=False):
 
 
 
-def split_segm(A, critical_point_list):
-    """
-    ###########################################################################################################
-    FUNCTION: split_segm
-              Takes the A array and divide it into N arrays according with the number of
-              critical points. Each array corresponds to a segment of the REG analysis.
+def split_segm(A : List[float], critical_point_list: List[int]) -> List[List[float]] :
+    """split_segm Takes the A array and divides it into N arrays according with the number of
+    critical points. Each array corresponds to a segment of the REG analysis.
 
-    INPUT: A, critical_point_list
-        A = Array containing the abcissa values of a function
-        critical_points_list = list of the index of the critical points (zero indexed)
-
-    OUTPUT: segm
-        segm = Array of arrays containing the values of A for each segment
-
-    ERROR:
-        "Invalid critical point index" : index of critical point out of range in the function array.
-    ###########################################################################################################
-    """
+    :raises ValueError: Invalid critical point index
+    :return: Array of arrays containing the values of A for each segment 
+    :rtype: List[List[float]]
+    """    
     critical_point_list = list(set(critical_point_list)) ## Remove duplicates and sort in crescent order
     #ERRORS:
     if critical_point_list[-1] >= len(A): ## Checks if index of critical point is in range of function
         raise ValueError("Invalid critical point index") 
 
     #INTERNAL VARIABLES:
-    segm = [] ## array os arrays
+    segm = [] ## array of arrays
     start = 0
     end = len(A)
     
