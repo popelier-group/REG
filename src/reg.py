@@ -50,28 +50,6 @@ def regression(A : List[float], B : List[float], mode=None) -> List[float,float,
 
 
 def find_critical(Y : List[float],X : List[float], min_points=3, use_inflex=False) -> List[int]:
-    """
-    ###########################################################################################################
-    FUNCTION: find_critical
-              Takes the X and Y values of a function and return the critical points
-              that fit the desirable criteria.
-
-    INPUT: Y, X, min_points, use_inflex
-        Y = ordinate values of a function
-        C = abcissa values of a function
-        min_point = 5 (default) : minimum amount of points between two critical points
-        use_inflex = False (default) : Not search for inflexion points (second derivative = 0)
-                     True            : Search for inflexion points (second derivative = 0)
-
-    OUTPUT: critical_point_list
-        critical_point_list = Array containing the index of critical points (zero indexed)
-
-    ERROR:
-        "Arrays must have the same size" : X and Y have different sizes.
-        "Invalid value. Use True or False" : invalid value for use_inflex
-        "Too many points between two critical points" : min_points must be lower than the X array length
-    ###########################################################################################################
-    """
     """find_critical finds the critical points (maximum,minimum,inflex) given the X, Y values of a linear function.
     Uses a minimum amount of points between two critical points.
 
