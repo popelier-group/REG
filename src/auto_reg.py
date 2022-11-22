@@ -14,7 +14,7 @@ saved in numbered folders) """
 
 # IMPORT LIBRARIES
 import sys
-sys.path.insert(1, '/mnt/iusers01/pp01/v69787ff/REG/')  # PLEASE INSERT THE PATH OF REG.py folder installation
+sys.path.insert(1, '/mnt/pp01-home01/v69787ff/SOFTWARE/REG.py/src/')  # PLEASE INSERT THE PATH OF REG.py folder installation
 import reg
 import aimall_utils as aim_u
 import numpy as np
