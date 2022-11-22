@@ -142,7 +142,7 @@ else:
     print("Successfully created the directory {a}/{b}_results".format(a=cwd,b=SYS))
 
 # GET ATOM LIST FROM ANY .WFN FILE:
-atoms = aim_u.get_atom_list(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
+atoms = aim_u.get_atom_list_wfn(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
 
 # Arrange files and folders in lists
 wfn_files = [cwd + '/' + reg_folders[i] + '/' + wfn_filelist[i] for i in range(0, len(reg_folders))]
