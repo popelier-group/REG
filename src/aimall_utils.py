@@ -198,7 +198,7 @@ def intra_property_from_int_file(folders : List[str], prop : List[str], atom_lis
     return intra_properties, contributions_list
 
 
-def inter_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List[List[float],List[str]]:
+def inter_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List:
     """inter_property_from_int_file gets IQA inter-atomic energy values from .int files output from AIMAll
 
     :raises ValueError: File is empty or does not exist
