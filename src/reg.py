@@ -129,7 +129,7 @@ def find_critical(Y : List[float],X : List[float], min_points=3, use_inflex=Fals
 
 
 
-def split_segm(A : List[float], critical_point_list: List[int]) -> List[List[float]] :
+def split_segm(A : List[float], critical_point_list: List[int]) -> List[float] :
     """split_segm Takes the A array and divides it into N arrays according with the number of
     critical points. Each array corresponds to a segment of the REG analysis.
 

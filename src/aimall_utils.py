@@ -141,7 +141,7 @@ def get_aimall_wfx_energies(wfx_files: List[str]) -> List[float]:
     return wfx_energy
 
 
-def intra_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List[List[float],List[str]]:
+def intra_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List:
     """intra_property_from_int_file gets IQA intra-atomic energy values from .int files output from AIMAll
 
     :raises ValueError: File is empty or does not exist
@@ -254,7 +254,7 @@ def inter_property_from_int_file(folders : List[str], prop : List[str], atom_lis
     return inter_properties, contributions_list
 
 
-def charge_transfer_and_polarisation_from_int_file(folders : List[str], atom_list : List[str], inter_properties : List[str], xyz_files: List[str]) -> List[List[float],List[str],List[float],List[str]] :
+def charge_transfer_and_polarisation_from_int_file(folders : List[str], atom_list : List[str], inter_properties : List[str], xyz_files: List[str]) -> List :
     """charge_transfer_and_polarisation_from_int_file gets IQA polarisation and charge-transfer energies
     values by computing them as Vct = qAqB/rAB and Vpl = Vcl - Vct
 
