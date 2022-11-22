@@ -7,11 +7,11 @@ Check for updates at github.com/FabioFalcioni
 """
 from typing import List
 
-def regression(A : List[float], B : List[float], mode=None) -> List[float,float,float]: 
+def regression(A : List[float], B : List[float], mode=None) -> List[float]: 
     """regression performs an ordinary least squares regression between two vectors
 
     :return: slope , intercept and pearson correlation coefficient
-    :rtype: List[float,float,float]
+    :rtype: List[float]
     """    
     #ERRORS:  
     if len(A) != len(B): #Checks if A and B have the same size
