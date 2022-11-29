@@ -387,11 +387,12 @@ rv.plot_segment(cc, 2625.50 * (total_energy_wfn - (sum(total_energy_wfn) / len(t
                 y_label=r'Relative Energy [$kJ.mol^{-1}$]', x_label=X_LABEL, title=SYS,
                 save=SAVE_FIG, file_name='REG_analysis.png')
 
-if DETAILED_ANALYSIS:
-    for i in range(len(reg_inter[0])):
-        rv.generate_data_vis(dataframe_list[i], [dataframe_list[i]['R'] for i in range(len(reg_inter[0]))],
-                             n_terms, save=SAVE_FIG, file_name='detailed_seg_' + str(i + 1) + '.png',
-                             title=SYS + ' seg. ' + str(i + 1))
+#TODO: reg_vis needs to be revisited
+# if DETAILED_ANALYSIS:
+#     for i in range(len(reg_inter[0])):
+#         rv.generate_data_vis(dataframe_list[i], [dataframe_list[i]['R'] for i in range(len(reg_inter[0]))],
+#                              n_terms, save=SAVE_FIG, file_name='detailed_seg_' + str(i + 1) + '.png',
+#                              title=SYS + ' seg. ' + str(i + 1))
 
 ###ENDING TIMER ###
 print("--- Total time for REG Analysis: {s} minutes ---".format(s=((time.time() - start_time) / 60)))
