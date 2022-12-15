@@ -1,0 +1,98 @@
+ AIMInt (Version 19.02.13, Professional)
+ Portions Copyright (c) 1997-2019 by Todd A. Keith
+ AIMInt is a component of the AIMAll package ( http://aim.tkgristmill.com )
+
+ TP:  64-bit Linux
+
+ Licensed To:  Paul Popelier at University of Manchester, UK
+
+ AIMInt is a heavily modified and extended version of the PROAIMV program
+ developed by members of R.F.W. Bader's research group
+
+ Much of the Quantum Theory of Atoms in Molecules (QTAIM) is described in the book:
+   "Atoms in Molecules - A Quantum Theory"
+   R.F.W. Bader, Oxford University Press, Oxford, 1990
+
+ For additional references see:  http://aim.tkgristmill.com/references.html
+
+ Current Directory:  /net/lustre/v69787ff/SN2_Replica/SN2_ClBr_B3LYP/13
+
+ Inp File:  frame_atomicfiles/c1_h3.inp
+ Wfn File:  frame.wfn
+ Out File:  frame_atomicfiles/c1_h3.int
+
+ Wfn Title:   Single Point Energy                                                           
+ Job Title:   Single Point Energy                                                           
+
+ The value of -V/T from the wfn file =  2.0014409800E+00
+ The molecular energy from the wfn file = -3.0743873040E+03
+ The Proaim surface algorithm will be used.
+ The critical points in the atomic surface:
+  1 BCP (Bond)   2.4824530803E-04   5.7981318555E-03  -6.4452304488E-01 Br5     
+  2 BCP (Bond)  -7.1181290510E-01  -1.1323606077E+00   1.3788956094E+00 H2      
+  3 BCP (Bond)  -1.3950465719E-04  -3.0489772357E-02   3.3556876559E+00 Cl6     
+  4 BCP (Bond)  -6.1334171468E-01   1.1637983724E+00   1.3997466508E+00 H3      
+  5 BCP (Bond)   1.3260027522E+00  -6.9559737710E-02   1.3886538817E+00 H4      
+ Optional parameters read from input.
+ 
+Model:  Restricted B3LYP
+ 
+ Restricted, closed-shell, single-determinant wavefunction.
+   Number of electrons (from MO Occs)                   =          62.0000000000
+   Number of Alpha electrons (from MO Occs)             =          31.0000000000
+   Number of Beta electrons (from MO Occs)              =          31.0000000000
+   Number of electron pairs (N*(N-1)/2)                 =        1891.0000000000
+   Number of electron pairs (from Muller 2EDM)          =        1891.0000000000
+ 
+ Integration is over atoms C1 and H3                                            
+ MPts_ESP = 132
+ 
+ MR 1    =      688  2.9321043064E-01 6.6821043064E-01
+ MR 2    =     2284  5.8819927875E-01 9.6319927875E-01
+ MR 3    =    10922  1.5978473828E+00 3.0256992788E+00
+ MR 4    =    18593  1.1732584895E+01 5.6603473828E+00
+
+ Total memory allocated for AIMInt =       24.105 Megabytes
+
+Calculating interaction energy contributions between atoms C1 and H3:  327 batches
+      
+ IQA Atomic and Diatomic Contributions to Diatomic ("Interaction") Energy Components (See "2EDM Note"):
+ -----------------------------------------------------------------------------------------------------
+ Atom A = C1      
+ Atom B = H3      
+ Vne(A,B)/2          = -1.2078550739E+00       Vne(A,B)          = -2.4157101478E+00
+ Ven(A,B)/2          = -1.4154879176E+00       Ven(A,B)          = -2.8309758352E+00
+ Vneen(A,B)/2        = -2.6233429915E+00       Vneen(A,B)        = -5.2466859831E+00
+ Vee(A,B)/2          =  1.0252373082E+00       Vee(A,B)          =  2.0504746164E+00
+ Vnn(A,B)/2          =  1.4794380371E+00       Vnn(A,B)          =  2.9588760742E+00
+ VeeC(A,B)/2         =  1.1663474810E+00       VeeC(A,B)         =  2.3326949619E+00
+ VeeX(A,B)/2         = -1.4111017277E-01       VeeX(A,B)         = -2.8222034554E-01
+ V_IQA(A,B)/2        = -1.1866764623E-01       V_IQA(A,B)        = -2.3733529245E-01
+ VC_IQA(A,B)/2       =  2.2442526541E-02       VC_IQA(A,B)       =  4.4885053083E-02
+ VX_IQA(A,B)/2       = -1.4111017277E-01       VX_IQA(A,B)       = -2.8222034554E-01
+ E_IQA_Inter(A,B)/2  = -1.1866764623E-01       E_IQA_Inter(A,B)  = -2.3733529245E-01
+ Vne(B,A)/2          = -1.4154879176E+00       Vne(B,A)          = -2.8309758352E+00
+ Ven(B,A)/2          = -1.2078550739E+00       Ven(B,A)          = -2.4157101478E+00
+ Vneen(B,A)/2        = -2.6233429915E+00       Vneen(B,A)        = -5.2466859831E+00
+ Vee(B,A)/2          =  1.0252373082E+00       Vee(B,A)          =  2.0504746164E+00
+ Vnn(B,A)/2          =  1.4794380371E+00       Vnn(B,A)          =  2.9588760742E+00
+ VeeC(B,A)/2         =  1.1663474810E+00       VeeC(B,A)         =  2.3326949619E+00
+ VeeX(B,A)/2         = -1.4111017277E-01       VeeX(B,A)         = -2.8222034554E-01
+ V_IQA(B,A)/2        = -1.1866764623E-01       V_IQA(B,A)        = -2.3733529245E-01
+ VC_IQA(B,A)/2       =  2.2442526541E-02       VC_IQA(B,A)       =  4.4885053083E-02
+ VX_IQA(B,A)/2       = -1.4111017277E-01       VX_IQA(B,A)       = -2.8222034554E-01
+ E_IQA_Inter(B,A)/2  = -1.1866764623E-01       E_IQA_Inter(B,A)  = -2.3733529245E-01
+
+2EDM Note:
+---------
+For post-HF, natural orbital "wavefunctions" the Muller approximation
+of the two-electron density matrix (2EDM) in terms of natural orbitals
+of the one-electron density matrix (1EDM) is used to calculate 2EDM-
+dependent properties (i.e., Vee contributions and electronic localization
+and delocalization properties).  For HF single-determinant wavefunctions the
+expression used for the 2EDM is exact.  2EDM-dependent properties are
+calculated with spin-orbital "self-interaction" terms included.
+
+ Total time =       16 sec
+
+ AIMInt is Done.
