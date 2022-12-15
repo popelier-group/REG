@@ -14,7 +14,7 @@ saved in numbered folders) """
 
 # IMPORT LIBRARIES
 import sys
-sys.path.insert(1, '/mnt/iusers01/pp01/v69787ff/REG/')  # PLEASE INSERT THE PATH OF REG.py folder installation
+sys.path.insert(1, '/mnt/pp01-home01/v69787ff/SOFTWARE/REG.py/src/')  # PLEASE INSERT THE PATH OF REG.py folder installation
 import reg
 import aimall_utils as aim_u
 import numpy as np
@@ -49,7 +49,7 @@ REVERSE = True  # Reverse the REG points
 INFLEX = False
 
 ### CONTROL COORDINATE OPTIONS ###
-CONTROL_COORDINATE_TYPE = 'Scan'  # 'Scan' or 'IRC'. If empty ('') then default will be used
+CONTROL_COORDINATE_TYPE = ''  # 'Scan' or 'IRC'. If empty ('') then default will be used
 Scan_Atoms = [1, 6]  # list of the atoms used for PES Scan (i.e. ModRedundant option in Gaussian)
 IRC_output = ''  # insert the g16 output file path if using IRC as control coordinate
 
@@ -79,9 +79,7 @@ n_terms = 4  # number of terms to rank in figures and tables
 
 # DEFINE PATHS AND FILES AUTOMATICALLY:
 cwd = str(os.getcwd())
-
 wfn_filelist = []
-
 # Get wfn files
 for k in os.walk(r"%s" % cwd):
     for i in range(0, len(k), 1):
@@ -98,9 +96,7 @@ for root, dirs, allfiles in os.walk(r'%s' % cwd):
         folderlist.append(folder)
         i = i + 1
 
-# Sort to ensure order
-folderlist = sorted(folderlist)
-wfn_filelist = sorted(wfn_filelist)
+
 
 # Find all the g16 single point energy files
 # NOTE: this works if the output files end with ".out"
@@ -121,8 +117,17 @@ for i in range(0, len(folderlist)):
             j = j + 1
     except:
         pass
-reg_folders.sort(key=lambda f: int(re.sub('\D', '', f)))
 
+#Try to sort by number if folders are mainly written with numbers files
+try:
+    folderlist.sort(key=lambda f: int(re.sub('\D', '', f)))
+    wfn_filelist.sort(key=lambda f: int(re.sub('\D', '', f)))
+    g16_out_file.sort(key=lambda f: int(re.sub('\D', '', f)))  
+except:
+    #Except sort simply by name
+    folderlist = sorted(folderlist)
+    wfn_filelist = sorted(wfn_filelist)
+reg_folders.sort(key=lambda f: int(re.sub('\D', '', f)))
 if REVERSE:
     reg_folders = reg_folders[::-1]
 
@@ -137,7 +142,7 @@ else:
     print("Successfully created the directory {a}/{b}_results".format(a=cwd,b=SYS))
 
 # GET ATOM LIST FROM ANY .WFN FILE:
-atoms = aim_u.get_atom_list(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
+atoms = aim_u.get_atom_list_wfn(cwd + '/' + reg_folders[0] + '/' + wfn_filelist[0])
 
 # Arrange files and folders in lists
 wfn_files = [cwd + '/' + reg_folders[i] + '/' + wfn_filelist[i] for i in range(0, len(reg_folders))]
@@ -243,14 +248,22 @@ dataframe_list = []
 if WRITE:
     # initialise excel file
     writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/REG.xlsx", engine='xlsxwriter')
-    # ENERGY ONLY .CSV FILES
+    energy_writer = pd.ExcelWriter(path=cwd + '/' + SYS + "_results/Energy.xlsx", engine='xlsxwriter')
+    # ENERGY and CONTROL  COORDINATE ONLY FILES
     df_energy_output = pd.DataFrame()
     df_energy_output['WFN'] = total_energy_wfn
     df_energy_output['IQA'] = total_energy_iqa
+    df_energy_output.index = cc
     if DISPERSION:
         df_energy_output['D3'] = total_energy_dispersion
     df_energy_output.to_csv('total_energy.csv', sep=',')
-    df_energy_output.to_excel(writer, sheet_name="total_energy")
+    df_energy_output.to_excel(energy_writer, sheet_name="total_energies")
+
+    pd.DataFrame(data=np.array(iqa_intra).transpose(), columns=iqa_intra_header).to_excel(energy_writer,
+                                                                                          sheet_name='intra-atomic_energies')
+    pd.DataFrame(data=np.array(iqa_inter).transpose(), columns=iqa_inter_header).to_excel(energy_writer,
+                                                                                          sheet_name='inter-atomic_energies')
+
 
     # INTER AND INTRA PROPERTIES RE-ARRANGEMENT
     list_property_final = []
@@ -297,7 +310,7 @@ if WRITE:
         df_dispersion_sorted.to_csv('REG_' + disp_name_new + '_analysis.csv', sep=',')
         df_dispersion_sorted.to_excel(writer, sheet_name="REG_" + disp_name_new)
         rv.pandas_REG_dataframe_to_table(df_dispersion_sorted, 'REG_' + disp_name_new + '_table', SAVE_FIG=SAVE_FIG)
-
+        pd.DataFrame(data = np.array(iqa_disp).transpose(), columns=iqa_disp_header).to_excel(energy_writer, sheet_name='dispersion_energies')
     # CHARGE-TRANSFER and POLARISATION
     if CHARGE_TRANSFER_POLARISATION:
         df_ct_pl_sorted = pd.DataFrame()
@@ -319,6 +332,10 @@ if WRITE:
         df_ct_pl_sorted.to_csv('REG_Vct-Vpl_analysis.csv', sep=',')
         df_ct_pl_sorted.to_excel(writer, sheet_name='REG_Vct-Vpl')
         rv.pandas_REG_dataframe_to_table(df_ct_pl_sorted, 'REG_Vct-Vpl_table', SAVE_FIG=SAVE_FIG)
+        pd.DataFrame(
+            data=np.concatenate((np.array(iqa_polarisation_terms), np.array(iqa_charge_transfer_terms))).transpose(),
+            columns=np.concatenate((iqa_polarisation_headers, iqa_charge_transfer_headers))).to_excel(energy_writer,
+                                                                                                      sheet_name='pl_ct_energies')
 
     # OUTPUT OF ALL INTER AND INTRA TERMS SELECTED BY THE USER
     all_prop_names = inter_prop_names + intra_prop_names
@@ -350,7 +367,7 @@ if WRITE:
     rv.pandas_REG_dataframe_to_table(df_final_sorted, 'REG_final_table', SAVE_FIG=SAVE_FIG)
 
     writer.save()
-
+    energy_writer.save()
     rv.plot_violin([dataframe_list[i]['R'] for i in range(len(reg_inter[0]))], save=SAVE_FIG,
                    file_name='violin.png')  # Violing plot of R vs Segments
 
@@ -370,11 +387,12 @@ rv.plot_segment(cc, 2625.50 * (total_energy_wfn - (sum(total_energy_wfn) / len(t
                 y_label=r'Relative Energy [$kJ.mol^{-1}$]', x_label=X_LABEL, title=SYS,
                 save=SAVE_FIG, file_name='REG_analysis.png')
 
-if DETAILED_ANALYSIS:
-    for i in range(len(reg_inter[0])):
-        rv.generate_data_vis(dataframe_list[i], [dataframe_list[i]['R'] for i in range(len(reg_inter[0]))],
-                             n_terms, save=SAVE_FIG, file_name='detailed_seg_' + str(i + 1) + '.png',
-                             title=SYS + ' seg. ' + str(i + 1))
+#TODO: reg_vis needs to be revisited
+# if DETAILED_ANALYSIS:
+#     for i in range(len(reg_inter[0])):
+#         rv.generate_data_vis(dataframe_list[i], [dataframe_list[i]['R'] for i in range(len(reg_inter[0]))],
+#                              n_terms, save=SAVE_FIG, file_name='detailed_seg_' + str(i + 1) + '.png',
+#                              title=SYS + ' seg. ' + str(i + 1))
 
 ###ENDING TIMER ###
 print("--- Total time for REG Analysis: {s} minutes ---".format(s=((time.time() - start_time) / 60)))

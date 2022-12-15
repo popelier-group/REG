@@ -2,10 +2,8 @@
 dft-d3_utils.py v0.0
 F. Falcioni, P. L. A. Popelier
 
-Library with function to submit job to AIMAll and get properties values from output
-AIMAll version: 19.02.13
+Library with function to submit job to DFT-D3 and get properties values from output
 Check for updates at github.com/FabioFalcioni
-For details about the method, please see XXXXXXX
 
 Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 coded by F.Falcioni

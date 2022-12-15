@@ -1,36 +1,23 @@
 """
 aimall_utils.py v0.1
-L. J. Duarte, XXXXXXX, P. L. A. Popelier 
+F. Falcioni, L. J. Duarte, P. L. A. Popelier 
 
 Library with function to submit job to AIMAll and get properties values from output
-AIMAll version: 17.11.14
-Check for updates at github.com/ljduarte
+AIMAll version: 19.10.12
+Check for updates at github.com/FabioFalcioni
 For details about the method, please see XXXXXXX
 
-Please, report bugs and issues to leo.j.duarte@hotmail.com.br
-coded by L. J. Duarte
 """
 
-import numpy as np
+import numpy as np 
+from typing import List
 
+def distance_A_B(xyz_file : str, atom_A : int, atom_B : int) -> float:
+    """distance_A_B gets the distance between atom A and B in an XYZ type file
 
-def distance_A_B(xyz_file, atom_A, atom_B):
-    """
-    ###########################################################################################################
-    FUNCTION: distance_A_B
-        get the distance between atom A and atom B
-    INPUT: wfn_file
-        xyz_file = xyz file obtained from the get_xyz_file function
-        atom_A = atomic labeling (integer)
-        atom_B = atomic labeling (integer)
-
-    OUTPUT: atom_list
-         r_AB = distance between atom A and atom B
-
-    ERROR:
-        "Atomic labels not found" : Atom list does not exist in wfn_file
-    ###########################################################################################################
-    """
+    :return: distance value 
+    :rtype: float
+    """    
     # INTERNAL VARIABLES:
     all_coordinates = []
 
@@ -51,24 +38,13 @@ def distance_A_B(xyz_file, atom_A, atom_B):
                 coord_atom_B[z] - coord_atom_A[z]) ** 2)
     return r_AB
 
+def get_atom_list_wfn(wfn_file : str) -> List[str]:
+    """get_atom_list_wfn is a function that gets atom labels from a wavefunction file (.wfn format)
 
-def get_atom_list(wfn_file):
-    """
-    ###########################################################################################################
-    FUNCTION: get_atom_list
-              get atomic labels from wfn file
-
-    INPUT: wfn_file
-        wfn_file = Any wfn file of the desired PES
-
-    OUTPUT: atom_list
-        list of each atom label for all atoms in molecule
-
-    ERROR:
-        "Atomic labels not found" : Atom list does not exist in wfn_file
-    ###########################################################################################################
-    """
-
+    :raises ValueError: Atomic labels not found
+    :return: list of atom labels
+    :rtype: List
+    """    
     # INTERNAL VARIABLES:
     atom_list = []
 
@@ -89,8 +65,13 @@ def get_atom_list(wfn_file):
 
     return atom_list
 
+def get_atom_list_wfx(wfx_file : str) -> List[str]:
+    """get_atom_list_wfx is a function that gets atom labels from a wavefunction file (.wfx format)
 
-def get_atom_list_wfx(wfx_file):
+    :raises ValueError: Atomic labels not found
+    :return: list of atom labels
+    :rtype: List
+    """    
     # INTERNAL VARIABLES:
     atom_list = []
 
@@ -114,28 +95,18 @@ def get_atom_list_wfx(wfx_file):
 
     return atom_list
 
+def get_aimall_wfn_energies(wfn_files : List[str]) -> List[float]:
+    """get_aimall_wfn_energies gets the total energy for each of the wavefunction (.wfn) files in a list
 
-def get_aimall_wfn_energies(A):
-    """
-    ###########################################################################################################
-    FUNCTION: get_aimall_wfn_energies
-              get all wfn energies from the wavefunction files (wfn)
-
-    INPUT:
-        A = list of all wfn files of the PES
-
-    OUTPUT: wfn_energy
-        wfn_energy = list of energies for each PES point
-
-    ERROR:
-        "Energy values not found in file : file_name" : No energy values in file_name
-    ###########################################################################################################
+    :raises ValueError: Energy values not found in wavefunction file
+    :return: list of energies
+    :rtype: List
     """
     # INTERNAL VARIABLES:
     wfn_energy = []  # List of wfn files
 
     # READ FILES
-    for path in A:
+    for path in wfn_files:
         file = open(path, "r")
         lines = file.readlines()
         # ERRORS:
@@ -146,13 +117,18 @@ def get_aimall_wfn_energies(A):
 
     return wfn_energy
 
+def get_aimall_wfx_energies(wfx_files: List[str]) -> List[float]:
+    """get_aimall_wfx_energies gets the total energy for each of the wavefunction (.wfx type) files in a list
 
-def get_aimall_wfx_energies(A):
+    :raises ValueError: Energy values not found in wavefunction file
+    :return: list of energies
+    :rtype: List
+    """
     # INTERNAL VARIABLES:
     wfx_energy = []  # List of wfn files
 
     # READ FILES
-    for path in A:
+    for path in wfx_files:
         file = open(path, "r")
         lines = file.readlines()
         # ERRORS:
@@ -165,25 +141,13 @@ def get_aimall_wfx_energies(A):
     return wfx_energy
 
 
-def intra_property_from_int_file(folders, prop, atom_list):
-    """
-    ###########################################################################################################
-    FUNCTION: intra_property_from_int_file
-              get IQA intra-atomic properties from int files
+def intra_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List:
+    """intra_property_from_int_file gets IQA intra-atomic energy values from .int files output from AIMAll
 
-    INPUT:
-        folders = path to _atomicfiles folders
-        prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']"
-        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
-
-    OUTPUT: [intra_properties, contributions_list]
-        intra_properties = array of array containing the IQA values for eacha atom for each geometry
-        contributions_list = list of contributions  organized in the same order as in intra_properties
-
-    ERROR:
-        File is empty or does not exist
-    ###########################################################################################################
-    """
+    :raises ValueError: File is empty or does not exist
+    :return: Lists of intra-atomic energies with the corresponding intra-atomic labeling
+    :rtype: List of floats and strings
+    """    
     # INTERNAL VARIABLES:
     temp1 = []  # Temporary array
     temp2 = []  # Temporary array
@@ -205,7 +169,7 @@ def intra_property_from_int_file(folders, prop, atom_list):
                     end = lines.index(i)
 
             if end >= len(lines):  # Checks the .int file.
-                raise ValueError('File is empty or not exist: ' + folder + "/" + atom + ".int")
+                raise ValueError('File is empty or does not exist: ' + folder + "/" + atom + ".int")
 
             lines = [lines[i] for i in range(start + 1, end)]
             for term in prop:
@@ -234,25 +198,13 @@ def intra_property_from_int_file(folders, prop, atom_list):
     return intra_properties, contributions_list
 
 
-def inter_property_from_int_file(folders, prop, atom_list):
-    """
-    ###########################################################################################################
-    FUNCTION: inter_property_from_int_file
-              get IQA interatomic properties from int files
+def inter_property_from_int_file(folders : List[str], prop : List[str], atom_list : List[str]) -> List:
+    """inter_property_from_int_file gets IQA inter-atomic energy values from .int files output from AIMAll
 
-    INPUT:
-        folders = path to _atomicfiles folders
-        prop = list of IQA for each atoms e.g.: "['T(A)', 'Vee(A,A)', 'Vne(A,A)']"
-        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
-
-    OUTPUT: [intra_properties, contributions_list]
-        intra_properties = array of array containing the IQA values for eacha atom for each geometry
-        contributions_list = list of contributions  organized in the same order as in intra_properties
-
-    ERROR:
-        "File is empty or does not exist"
-    ###########################################################################################################
-    """
+    :raises ValueError: File is empty or does not exist
+    :return: Lists of inter-atomic energies with the corresponding intra-atomic labeling
+    :rtype: List of floats and strings
+    """    
     # INTERNAL VARIABLES:
     temp1 = []  # Temporary array
     temp2 = []  # Temporary array
@@ -302,28 +254,14 @@ def inter_property_from_int_file(folders, prop, atom_list):
     return inter_properties, contributions_list
 
 
-def charge_transfer_and_polarisation_from_int_file(folders, atom_list, inter_properties, xyz_files):
-    """
-    ###########################################################################################################
-    FUNCTION: charge_transfer_and_polarisation_from_int_file
-        get IQA monopolar charge-transfer and polarisation properties from int files
+def charge_transfer_and_polarisation_from_int_file(folders : List[str], atom_list : List[str], inter_properties : List[str], xyz_files: List[str]) -> List :
+    """charge_transfer_and_polarisation_from_int_file gets IQA polarisation and charge-transfer energies
+    values by computing them as Vct = qAqB/rAB and Vpl = Vcl - Vct
 
-    INPUT:
-        folders = path to _atomicfiles folders
-        atom_list = list of atomic lables e.g.: [n1, c2, h3, ...]
-        inter_properties = array of inter-atomic properties
-        xyz_files = xyz files list obtained from the get_xyz_file function
-
-    OUTPUT:
-        charge_transfer_properties = array of array containing the IQA charge transfer values for each atom for each geometry
-        contributions_list_CT = list of contributions  organized in the same order as in charge_transfer_properties
-        polarisation_properties = array of array containing the IQA polarisation values for each atom for each geometry
-        contributions_list_PL = list of contributions  organized in the same order as in polarisation_properties
-
-    ERROR:
-        "File is empty or does not exist"
-    ###########################################################################################################
-    """
+    :raises ValueError: File is empty or does not exist
+    :return: Returns lists of energies and labels for both Vct and Vpl
+    :rtype: List of floats and strings
+    """    
     # INTERNAL VARIABLES:
     n = len(atom_list)
     f = len(folders)
