@@ -9,7 +9,7 @@ Check for updates at github.com/FabioFalcioni
 Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 coded by F.Falcioni
 """
-import REG.reg as reg
+from REG import reg
 import numpy as np
 import matplotlib.pyplot as plt
 from optparse import OptionParser

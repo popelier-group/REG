@@ -13,6 +13,7 @@ NOTE: The automatic analysis works if this file is run with python3 inside a fol
 saved in numbered folders) """
 
 # IMPORT LIBRARIES
+import REG.reg as reg
 import REG.aimall_utils as aim_u
 import REG.reg_vis as rv
 import REG.gaussian_utils as gauss_u
