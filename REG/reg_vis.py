@@ -4,6 +4,7 @@ from scipy.stats import norm
 import matplotlib.pyplot as plt
 from adjustText import adjust_text
 from matplotlib.ticker import MultipleLocator  
+import re
 
 def set_axis_style(ax, labels):
     ax.get_xaxis().set_tick_params(direction='out')
@@ -197,9 +198,11 @@ def create_term_dataframe(reg_dataframe, headers, i):
 def filter_term_dataframe(prop_dataframe, original_prop_name, new_prop_name):
     col = ['TERM','REG','R']
     new_df = pd.DataFrame()
-    for j in range(0, len(prop_dataframe['TERM'])):
-        if original_prop_name in prop_dataframe['TERM'][j]:
-             new_df =  new_df.append(prop_dataframe.iloc[j])
+    #for j in range(0, len(prop_dataframe['TERM'])):
+    #    if original_prop_name in prop_dataframe['TERM'][j]:
+    #         new_df =  new_df.append(prop_dataframe.iloc[j])
+    temp = re.escape(original_prop_name)
+    new_df = prop_dataframe[prop_dataframe['TERM'].str.contains(temp)]
     new_df = new_df[col]
     new_df = new_df.sort_values('REG').reset_index(drop=True)
     new_df['TERM'] = new_df['TERM'].apply(lambda row:row.replace(original_prop_name + '-', new_prop_name +'('))
