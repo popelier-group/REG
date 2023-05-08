@@ -112,6 +112,6 @@ Note (06/12/2020): AIMAll works with LSDA, B3LYP, PBE, PBE0, M062X
     else:
         functional_list = ['B3-LYP','M062X','PBE', 'PBE0']
         if functional.upper() in functional_list:
-            os.system(program_path + ' ' + xyz_file + ' -func ' + functional.lower() + ' -anal > dft-d3.log')
+            os.system(program_path + ' ' + xyz_file + ' -func ' + functional.lower() + ' -zero  -anal > dft-d3.log')
         else:
             raise ValueError('Insert a functional that works with AIMAll')
