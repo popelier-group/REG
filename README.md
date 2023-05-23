@@ -44,7 +44,7 @@ Minimum requirements:
 All results of the REG analysis will be saved in a folder called "SYSTEM_results" with SYSTEM being the chosen system name.
 Inside the folder different files for each type of energy will be found together with png images of the REG tables and various csv files for later data analysis.
 The main file is called "REG.xlsx" which contains all the results together in one place.
-The "REG.xlsx" file can also be input into PyMol for better visualisation through a custom [PyMol-REG plugin]("https://github.com/popelier-group/PyMol-REG")
+The "REG.xlsx" file can also be input into PyMol for better visualisation through a custom [PyMol-REG]("https://github.com/popelier-group/PyMol-REG") plugin.
 
 ## References
 
