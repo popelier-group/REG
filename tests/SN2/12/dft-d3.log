@@ -1,0 +1,104 @@
+  _________________________________
+                                   
+ |         DFTD3 V3.1 Rev 1        |
+ | S.Grimme, University Bonn       |
+ |         October  2015           |
+ |   see dftd3 -h for options      |
+  _________________________________
+ 
+ Please cite DFT-D3 work done with this code as:
+ S. Grimme, J. Antony, S. Ehrlich and H. Krieg,
+ J. Chem. Phys. 132 (2010), 154104
+ If used with BJ-damping cite also
+ S. Grimme, S. Ehrlich and L. Goerigk,
+ J. Comput. Chem. 32 (2011), 1456-1465
+ For DFT-D2 the reference is
+ S. Grimme, J. Comput. Chem., 27 (2006), 1787-1799
+ For DFT-D3M or DFT-D3M(BJ) the reference is
+ D.G.A. Smith, L.A. Burns, K. Patkowski, and 
+ C.D. Sherrill, J. Phys. Chem. Lett. 7 (2016) 2197-2203
+ 
+  files read :     
+ SP_WFN.xyz
+C6 coefficients used:
+           2  C6 for element            1
+Z=  1 CN= 0.912     C6(AA)=    3.03
+Z=  1 CN= 0.000     C6(AA)=    7.59
+           5  C6 for element            6
+Z=  6 CN= 0.000     C6(AA)=   49.11
+Z=  6 CN= 0.987     C6(AA)=   43.25
+Z=  6 CN= 1.998     C6(AA)=   29.36
+Z=  6 CN= 2.999     C6(AA)=   25.78
+Z=  6 CN= 3.984     C6(AA)=   18.21
+           2  C6 for element           17
+Z= 17 CN= 0.000     C6(AA)=   92.35
+Z= 17 CN= 0.997     C6(AA)=   90.40
+           2  C6 for element           35
+Z= 35 CN= 0.000     C6(AA)=  167.13
+Z= 35 CN= 0.997     C6(AA)=  169.24
+
+#               XYZ [au]               R0(AA) [Ang.]  CN       C6(AA)     C8(AA)   C10(AA) [au] 
+   1   0.01526   0.13645   1.20359   c     0.566    3.930        18.4       532.5     18865.7
+   2   1.27209   1.72929   1.22392   h     0.366    1.011         3.1        37.3       552.4
+   3   0.75954  -1.70481   1.61948   h     0.366    1.011         3.1        37.3       552.4
+   4  -1.97758   0.45768   1.41002   h     0.366    1.011         3.1        37.3       552.4
+   5  -0.04190  -0.36574  -3.22952   br    0.838    0.782       169.0     10688.1    827849.9
+   6   0.07769   0.67647   5.97401   cl    0.680    0.213        92.2      3845.4    196543.5
+
+molecular C6(AA) [au] =      1032.36
+
+           DFT-D V3(BJ)
+ DF b3-lyp                                            
+ parameters
+ s6       :    1.0000
+ s8       :    1.9889
+ a1       :    0.3981
+ a2       :    4.4211
+ k1-k3    :   16.0000    1.3333   -4.0000
+ Cutoff   :   94.8683 a.u.
+ CN-Cutoff:   40.0000 a.u.
+ 
+ Edisp /kcal,au:    -4.3624 -0.00695189
+
+ E6    /kcal :    -1.8762
+ E8    /kcal :    -2.4862
+ % E8        : 56.99
+ 
+ analysis of pair-wise terms (in kcal/mol)
+pair  atoms         C6              C8            E6       E8       Edisp
+   1   2    6  1    0.747917D+01    0.139846D+03  -0.0873  -0.0861  -0.17337
+   1   3    6  1    0.747917D+01    0.139846D+03  -0.0873  -0.0861  -0.17337
+   1   4    6  1    0.747918D+01    0.139846D+03  -0.0873  -0.0861  -0.17337
+   1   5    6 35    0.553088D+02    0.236518D+04  -0.2711  -0.4851  -0.75623
+   1   6    6 17    0.410528D+02    0.142609D+04  -0.2378  -0.3802  -0.61799
+   2   3    1  1    0.308568D+01    0.373008D+02  -0.0483  -0.0355  -0.08377
+   2   4    1  1    0.308568D+01    0.373008D+02  -0.0483  -0.0355  -0.08377
+   2   5    1 35    0.228305D+02    0.631186D+03  -0.1526  -0.2131  -0.36570
+   2   6    1 17    0.168480D+02    0.378376D+03  -0.1342  -0.1627  -0.29686
+   3   4    1  1    0.308568D+01    0.373008D+02  -0.0483  -0.0355  -0.08377
+   3   5    1 35    0.228305D+02    0.631186D+03  -0.1526  -0.2131  -0.36570
+   3   6    1 17    0.168480D+02    0.378376D+03  -0.1342  -0.1627  -0.29687
+   4   5    1 35    0.228305D+02    0.631186D+03  -0.1526  -0.2131  -0.36569
+   4   6    1 17    0.168480D+02    0.378376D+03  -0.1342  -0.1627  -0.29684
+   5   6   35 17    0.124655D+03    0.640262D+04  -0.1003  -0.1288  -0.22908
+
+distance range (Angstroem) analysis
+writing histogram data to <histo.dat>
+R(low,high), Edisp, %tot : 0.0 1.5    -0.52011   11.92
+R(low,high), Edisp, %tot : 1.5 2.0    -0.25131    5.76
+R(low,high), Edisp, %tot : 2.0 2.3     0.00000    0.00
+R(low,high), Edisp, %tot : 2.3 2.7    -2.26479   51.92
+R(low,high), Edisp, %tot : 2.7 3.0    -1.09708   25.15
+R(low,high), Edisp, %tot : 3.0 3.3     0.00000    0.00
+R(low,high), Edisp, %tot : 3.3 3.7     0.00000    0.00
+R(low,high), Edisp, %tot : 3.7 4.0     0.00000    0.00
+R(low,high), Edisp, %tot : 4.0 4.5     0.00000    0.00
+R(low,high), Edisp, %tot : 4.5 5.0    -0.22908    5.25
+R(low,high), Edisp, %tot : 5.0 5.5     0.00000    0.00
+R(low,high), Edisp, %tot : 5.5 6.0     0.00000    0.00
+R(low,high), Edisp, %tot : 6.0 7.0     0.00000    0.00
+R(low,high), Edisp, %tot : 7.0 8.0     0.00000    0.00
+R(low,high), Edisp, %tot : 8.0 9.0     0.00000    0.00
+R(low,high), Edisp, %tot : 9.010.0     0.00000    0.00
+ checksum (Edisp)   -4.36237743487878     
+ normal termination of dftd3

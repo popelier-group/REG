@@ -13,16 +13,19 @@ NOTE: The automatic analysis works if this file is run with python3 inside a fol
 saved in numbered folders) """
 
 # IMPORT LIBRARIES
+import time
+import re
+import os
+from pathlib import Path
+from natsort import natsorted
+from typing import List
+import numpy as np
+import pandas as pd
 import REG.reg as reg
 import REG.aimall_utils as aim_u
 import REG.reg_vis as rv
 import REG.gaussian_utils as gauss_u
 import REG.dftd3_utils as disp_u
-import numpy as np
-import pandas as pd
-import re
-import os
-import time
 
 ### STARTING TIMER ###
 start_time = time.time()
@@ -50,17 +53,17 @@ inter_prop_names = [
     "Einter",
 ]  # names of the properties shown in the output
 
-REVERSE = True  # Reverse the REG points
+# REVERSE = True  # Reverse the REG points
 
-INFLEX = False
+# INFLEX = False
 
 ### CONTROL COORDINATE OPTIONS ###
-CONTROL_COORDINATE_TYPE = ""  # 'Scan' or 'IRC'. If empty ('') then default will be used
-Scan_Atoms = [
-    1,
-    6,
-]  # list of the atoms used for PES Scan (i.e. ModRedundant option in Gaussian)
-IRC_output = ""  # insert the g16 output file path if using IRC as control coordinate
+# CONTROL_COORDINATE_TYPE = ""  # 'Scan' or 'IRC'. If empty ('') then default will be used
+# Scan_Atoms = [
+#     1,
+#     6,
+# ]  # list of the atoms used for PES Scan (i.e. ModRedundant option in Gaussian)
+# IRC_output = ""  # insert the g16 output file path if using IRC as control coordinate
 
 CHARGE_TRANSFER_POLARISATION = True  # Split the classical electrostatic term into polarisation and monopolar charge-transfer
 
@@ -88,15 +91,98 @@ n_terms = 10  # number of terms to rank in figures and tables
 #                                                                             #
 ###############################################################################
 
+
+class REGFolder:
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self.file_extensions = set()
+        self._create_attributes()
+        self._check_main_extensions()
+        self._parse_wfn()
+
+    def _create_attributes(self):
+        for file_path in self.path.glob("*"):
+            if file_path.is_file():
+                extension = file_path.suffix[1:]
+                self.file_extensions.add(extension)
+                setattr(self, extension, file_path)
+            elif file_path.is_dir():
+                if "_atomicfiles" in str(file_path):
+                    setattr(self, "atomicfiles", file_path)
+
+    def _check_main_extensions(self):
+        if not self.wfn or not self.atomicfiles:
+            raise FileNotFoundError(f"{self.path} does not contain all necessary files")
+
+    @staticmethod
+    def split_string_by_intervals(s: str, intervals: List[int]) -> List[str]:
+        substrings = []
+        prev_idx = 0
+        for i in intervals:
+            substrings.append(s[prev_idx:prev_idx+i])
+            prev_idx += i
+        return substrings
+
+    @staticmethod
+    def BohrToAng(value):
+        return value * 0.52917720859
+    
+    def _parse_wfn(self):
+        with open(self.wfn, 'r') as f:
+            title = next(f).strip()
+            header = next(f).split()
+            n_atoms = int(header[6])
+            self.atoms = []
+            self.atom_types = []
+            line = next(f)
+            while not line.startswith(r"CENTRE ASSIGNMENTS"):
+                record = split_string_by_intervals(
+                    line, [4, 4, 16, 12, 12, 12, 10]
+                )
+                atom_type = record[0]
+                x = float(record[3])
+                y = float(record[4])
+                z = float(record[5])
+                nuclear_charge = float(record[-1])  # nuclear charge, not used
+                
+                line = next(f)
+
+
+    @classproperty
+    def total_energy(self):
+    
+    @classproperty
+    def atoms(self):
+
+    @staticmethod
+    def BohrTokJ(e):
+        return e * 2625.5
+
+
+# Current working directory
+cwd = Path.cwd()
+# Get all REG folders
+file_extensions = {".wfn", ".gjf"}
+
+unsorted_reg_folders = []
+
 # DEFINE PATHS AND FILES AUTOMATICALLY:
-cwd = str(os.getcwd())
-wfn_filelist = []
-# Get wfn files
-for k in os.walk(r"%s" % cwd):
-    for i in range(0, len(k), 1):
-        for j in range(0, len(k[i]), 1):
-            if ".wfn" in k[i][j]:
-                wfn_filelist.append(k[i][j])
+for folder in cwd.glob("**/*"):
+    for file in folder.glob("*"):
+        if file.suffix in file_extensions:
+            folder_name = folder.name
+            if folder_name not in unsorted_reg_folders:
+                unsorted_reg_folders.append(folder_name)
+
+reg_folders = natsorted(unsorted_reg_folders)
+reg_folders = [REGFolder(p) for p in reg_folders]
+
+atoms = aim_u.get_atom_list_wfn(str(reg_folders[0].wfn))
+# GET TOTAL ENERGY FROM THE .WFN FILES:
+total_energy_wfn = aim_u.get_aimall_wfn_energies([p.wfn.tokjmol for p in reg_folders])
+print(total_energy_wfn)
+# xyz_files = [gauss_u.get_xyz_file(file) for file in g16_files]
+quit()
 
 # Finds the root, folders and all the files within the CWD and stores them as variables:
 # 'root', 'dirs' and 'allfiles'
@@ -274,7 +360,7 @@ if DISPERSION:
         if os.path.isfile((cwd + "/" + reg_folders[i] + "/" + wfn_filelist[i])):
             os.chdir((cwd + "/" + reg_folders[i] + "/"))
             xyz_file = gauss_u.get_xyz_file(g16_out_file[i])
-            disp_u.run_DFT_D3(DFT_D3_PATH, xyz_file, DISP_FUNCTIONAL,BJ_DAMPING)
+            disp_u.run_DFT_D3(DFT_D3_PATH, xyz_file, DISP_FUNCTIONAL, BJ_DAMPING)
 
     folders_disp = [
         cwd + "/" + reg_folders[i] + "/dft-d3.log" for i in range(0, len(reg_folders))
