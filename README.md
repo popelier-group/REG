@@ -7,6 +7,7 @@ The manual.pdf contains the information regarding the theory and the code implem
 Please, report bugs and issues to fabio.falcioni@manchester.ac.uk
 
 Please, cite [[1]](#1) if using this code for your studies/research. The code is under MIT license.
+If using the Ramer-Douglas-Peucker algorithm on a potential energy surface from electronic structure calculations, please cite [[2]](#2)[[3]](#3).
 
 # Installation
 
@@ -22,7 +23,7 @@ Note that _auto_reg.py_ is not part of the library but it is an external script 
 To run a REG analysis (with IQA and DFT-D3):
 
 - Install REG in your machine (preferably in a conda environment).
-- Copy the `auto_reg.py` script in the folder where each REG step has been saved. Note: Each REG step should be saved as a numbered folder and contain the gaussian single point energy output, gaussian wavefunction output and the atomic-files folder obtained with AIMAll [[3]](#3).
+- Copy the `auto_reg.py` script in the folder where each REG step has been saved. Note: Each REG step should be saved as a numbered folder and contain the gaussian single point energy output, gaussian wavefunction output and the atomic-files folder obtained with AIMAll [[4]](#4).
 - Enter the script with a text editor, change all the possible options as explained in the script.
 - Run the command :
   `python3 auto_reg.py > reg.log &`
@@ -30,11 +31,13 @@ To run a REG analysis (with IQA and DFT-D3):
 # Setup Ramer-Douglas-Peucker
 
 The `setup_rdp.py` is a standalone script that can be run with specific options to find the suitable number of points on which to run the following REG-IQA analysis.
-It uses the Ramer-Douglas-Peucker algorithm [[2]](#2) on the PES obtained from electronic structure calculations.
+It uses the Ramer-Douglas-Peucker algorithm [[2]](#2)[[3]](#3) on the PES obtained from electronic structure calculations.
+
 Run the command
 `python3 setup_rdp.py -h (or --help)`
 for the usage.
 
+NOTE: if REG is installed with pip , this script is automatically added as an executable command named `rdp`.
 Minimum requirements:
 
 - A txt file containing the energies at each step of an IRC or PES scan (easily obtained in GaussView).
@@ -52,7 +55,12 @@ The "REG.xlsx" file can also be input into PyMol for better visualisation throug
 Thacker, Joseph CR, and Paul LA Popelier. "The ANANKE relative energy gradient (REG) method to automate IQA analysis over configurational change." Theoretical chemistry accounts 136.7 (2017): 1-13.
 
 <a id="2">[2]</a>
-Douglas, D.H. and T.K. Peucker, Algorithms for the reduction of the number of points required to represent a digitized line or its caricature. Cartographica: the international journal for geographic information and geovisualization, 1973. 10(2): p. 112-122.
+Fabio Falcioni and Paul L. A. Popelier
+Journal of Chemical Information and Modeling 2023 63 (14), 4312-4327
+DOI: 10.1021/acs.jcim.3c00404
 
 <a id="3">[3]</a>
+Douglas, D.H. and T.K. Peucker, Algorithms for the reduction of the number of points required to represent a digitized line or its caricature. Cartographica: the international journal for geographic information and geovisualization, 1973. 10(2): p. 112-122.
+
+<a id="4">[4]</a>
 AIMAll (Version 19.10.12), Todd A. Keith, TK Gristmill Software, Overland Park KS, USA, 2019 (aim.tkgristmill.com)
