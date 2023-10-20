@@ -24,21 +24,24 @@ import re
 import os
 import time
 
+
 def main():
     ### STARTING TIMER ###
     start_time = time.time()
     ##############################    VARIABLES    ##################################
-    
+
     SYS = "SN2_ClBr_B3LYP"  # name of the system
-    
+
     ### PES Critical points options ###
     POINTS = 4  # number of points for "find_critical" function
     AUTO = True  # Search for critical points
     turning_points = []  # manually put critical points in the PES if necessary
     # NOTE: If analysing only a single segment (i.e. the PES has no critical points) please put AUTO=False and tp=[]
-    
+
     # DEFINE THE DESIRED TERMS:
-    intra_prop = ["E_IQA_Intra(A)"]  # chose the AIMAll intra atomic properties to analyse
+    intra_prop = [
+        "E_IQA_Intra(A)"
+    ]  # chose the AIMAll intra atomic properties to analyse
     intra_prop_names = ["Eintra"]  # names of the properties shown in the output
     inter_prop = [
         "VC_IQA(A,B)",
@@ -50,21 +53,25 @@ def main():
         "Vxc",
         "Einter",
     ]  # names of the properties shown in the output
-    
+
     REVERSE = True  # Reverse the REG points
-    
+
     INFLEX = False
-    
+
     ### CONTROL COORDINATE OPTIONS ###
-    CONTROL_COORDINATE_TYPE = ""  # 'Scan' or 'IRC'. If empty ('') then default will be used
+    CONTROL_COORDINATE_TYPE = (
+        ""  # 'Scan' or 'IRC'. If empty ('') then default will be used
+    )
     Scan_Atoms = [
         1,
         6,
     ]  # list of the atoms used for PES Scan (i.e. ModRedundant option in Gaussian)
-    IRC_output = ""  # insert the g16 output file path if using IRC as control coordinate
-    
+    IRC_output = (
+        ""  # insert the g16 output file path if using IRC as control coordinate
+    )
+
     CHARGE_TRANSFER_POLARISATION = True  # Split the classical electrostatic term into polarisation and monopolar charge-transfer
-    
+
     DISPERSION = True  # Run DFT-D3 program to consider dispersion
     # NOTE: This only works if you have DFT-D3 program installed in the same machine https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3/
     ### DISPERSION OPTIONS ###
@@ -73,22 +80,22 @@ def main():
     )
     DISP_FUNCTIONAL = "B3-LYP"  # insert the functional used for D3 correction
     BJ_DAMPING = True  # Becke-Johnson Damping
-    
+
     WRITE = True  # write csv files for energy values and REG analysis
     SAVE_FIG = True  # save figures
     ANNOTATE = True  # annotate figures
     DETAILED_ANALYSIS = True
     LABELS = True  # label figures
     n_terms = 4  # number of terms to rank in figures and tables
-    
+
     ##################################################################################
-    
+
     ###############################################################################
     #                                                                             #
     #                           AUTOMATIC FILES SETUP                             #
     #                                                                             #
     ###############################################################################
-    
+
     # DEFINE PATHS AND FILES AUTOMATICALLY:
     cwd = str(os.getcwd())
     wfn_filelist = []
@@ -98,7 +105,7 @@ def main():
             for j in range(0, len(k[i]), 1):
                 if ".wfn" in k[i][j]:
                     wfn_filelist.append(k[i][j])
-    
+
     # Finds the root, folders and all the files within the CWD and stores them as variables:
     # 'root', 'dirs' and 'allfiles'
     folderlist = []
@@ -107,8 +114,7 @@ def main():
         for folder in dirs:
             folderlist.append(folder)
             i = i + 1
-    
-    
+
     # Find all the g16 single point energy files
     # NOTE: this works if the output files end with ".out"
     g16_out_file = []
@@ -117,7 +123,7 @@ def main():
         for file in allfiles:
             if file.endswith(".out"):
                 g16_out_file.append(file)
-    
+
     # Find all the REG points folders and sort them by number
     reg_folders = []
     j = 0
@@ -128,7 +134,7 @@ def main():
                 j = j + 1
         except:
             pass
-    
+
     # Try to sort by number if folders are mainly written with numbers files
     try:
         folderlist.sort(key=lambda f: int(re.sub("\D", "", f)))
@@ -141,7 +147,7 @@ def main():
     reg_folders.sort(key=lambda f: int(re.sub("\D", "", f)))
     if REVERSE:
         reg_folders = reg_folders[::-1]
-    
+
     os.chdir(cwd)  # working directory
     # Create results directory
     access_rights = 0o755
@@ -155,10 +161,10 @@ def main():
         )
     else:
         print("Successfully created the directory {a}/{b}_results".format(a=cwd, b=SYS))
-    
+
     # GET ATOM LIST FROM ANY .WFN FILE:
     atoms = aim_u.get_atom_list_wfn(cwd + "/" + reg_folders[0] + "/" + wfn_filelist[0])
-    
+
     # Arrange files and folders in lists
     wfn_files = [
         cwd + "/" + reg_folders[i] + "/" + wfn_filelist[i]
@@ -173,7 +179,7 @@ def main():
         for i in range(0, len(reg_folders))
     ]
     xyz_files = [gauss_u.get_xyz_file(file) for file in g16_files]
-    
+
     # Get control coordinate list
     if CONTROL_COORDINATE_TYPE == "Scan":
         cc = gauss_u.get_control_coordinates_PES_Scan(g16_files, Scan_Atoms)
@@ -187,10 +193,9 @@ def main():
     cc = np.array(cc)
     if REVERSE:
         cc = -cc
-    
+
     ### INTRA AND INTER ENERGY TERMS ###
-    
-    
+
     # GET TOTAL ENERGY FROM THE .WFN FILES:
     total_energy_wfn = aim_u.get_aimall_wfn_energies(wfn_files)
     total_energy_wfn = np.array(total_energy_wfn)
@@ -206,13 +211,13 @@ def main():
     )
     iqa_inter_header = np.array(iqa_inter_header)  # used for reference
     iqa_inter = np.array(iqa_inter)
-    
+
     ###############################################################################
     #                                                                             #
     #                               REG ANALYSIS                                  #
     #                                                                             #
     ###############################################################################
-    
+
     # INTRA ATOMIC CONTRIBUTION
     reg_intra = reg.reg(
         total_energy_wfn,
@@ -233,7 +238,7 @@ def main():
         inflex=INFLEX,
         critical_index=turning_points,
     )
-    
+
     # GET CT and PL TERMS:
     if CHARGE_TRANSFER_POLARISATION:
         (
@@ -268,7 +273,7 @@ def main():
             inflex=INFLEX,
             critical_index=turning_points,
         )
-    
+
     ### DISPERSION ANALYSIS ###
     if DISPERSION:
         for i in range(0, len(reg_folders)):
@@ -276,9 +281,10 @@ def main():
                 os.chdir((cwd + "/" + reg_folders[i] + "/"))
                 xyz_file = gauss_u.get_xyz_file(g16_out_file[i])
                 disp_u.run_DFT_D3(DFT_D3_PATH, xyz_file, DISP_FUNCTIONAL)
-    
+
         folders_disp = [
-            cwd + "/" + reg_folders[i] + "/dft-d3.log" for i in range(0, len(reg_folders))
+            cwd + "/" + reg_folders[i] + "/dft-d3.log"
+            for i in range(0, len(reg_folders))
         ]
         # GET INTER-ATOMIC DISPERSION TERMS:
         iqa_disp, iqa_disp_header = disp_u.disp_property_from_dftd3_file(
@@ -297,12 +303,12 @@ def main():
             critical_index=turning_points,
         )
         total_energy_dispersion = sum(iqa_disp)
-    
+
     # CALCULATE TOTAL ENERGIES
     total_energy_iqa = sum(iqa_inter[: (len(atoms) * (len(atoms) - 1))]) + sum(
         iqa_intra[: len(atoms)]
     )  # used to calculate the integration error
-    
+
     # CALCULATE RECOVERY ERROR
     if DISPERSION:
         rmse_integration = reg.integration_error(
@@ -312,7 +318,7 @@ def main():
         rmse_integration = reg.integration_error(total_energy_wfn, total_energy_iqa)
     print("Integration error [kJ/mol](RMSE)")
     print(rmse_integration[1])
-    
+
     ###############################################################################
     #                                                                             #
     #                             WRITE CSV FILES                                 #
@@ -320,7 +326,7 @@ def main():
     ###############################################################################
     os.chdir(cwd + "/" + SYS + "_results")
     dataframe_list = []
-    
+
     if WRITE:
         # initialise excel file
         writer = pd.ExcelWriter(
@@ -338,14 +344,14 @@ def main():
             df_energy_output["D3"] = total_energy_dispersion
         df_energy_output.to_csv("total_energy.csv", sep=",")
         df_energy_output.to_excel(energy_writer, sheet_name="total_energies")
-    
+
         pd.DataFrame(
             data=np.array(iqa_intra).transpose(), columns=iqa_intra_header
         ).to_excel(energy_writer, sheet_name="intra-atomic_energies")
         pd.DataFrame(
             data=np.array(iqa_inter).transpose(), columns=iqa_inter_header
         ).to_excel(energy_writer, sheet_name="inter-atomic_energies")
-    
+
         # INTER AND INTRA PROPERTIES RE-ARRANGEMENT
         list_property_final = []
         final_properties_comparison = []
@@ -388,7 +394,7 @@ def main():
                 )
             list_property_final.append(list_property_sorted)
             final_properties_comparison.append(properties_comparison)
-    
+
         # DISPERSION OUTPUT
         if DISPERSION:
             df_dispersion_sorted = pd.DataFrame()
@@ -399,7 +405,9 @@ def main():
                 df_disp_new = rv.filter_term_dataframe(
                     df_disp, disp_name_old, disp_name_new
                 )
-                df_disp_new.to_csv(disp_name_new + "_seg_" + str(i + 1) + ".csv", sep=",")
+                df_disp_new.to_csv(
+                    disp_name_new + "_seg_" + str(i + 1) + ".csv", sep=","
+                )
                 df_disp_new.to_excel(
                     writer, sheet_name=disp_name_new + "_seg_" + str(i + 1)
                 )
@@ -409,16 +417,22 @@ def main():
                 df_dispersion_sorted = pd.concat(
                     [
                         df_dispersion_sorted.reset_index(drop=True),
-                        pd.concat([df_disp_new[-n_terms:], df_disp_new[:n_terms]], axis=0)
+                        pd.concat(
+                            [df_disp_new[-n_terms:], df_disp_new[:n_terms]], axis=0
+                        )
                         .sort_values("REG")
                         .reset_index(drop=True),
                     ],
                     axis=1,
                 )
-            df_dispersion_sorted.to_csv("REG_" + disp_name_new + "_analysis.csv", sep=",")
+            df_dispersion_sorted.to_csv(
+                "REG_" + disp_name_new + "_analysis.csv", sep=","
+            )
             df_dispersion_sorted.to_excel(writer, sheet_name="REG_" + disp_name_new)
             rv.pandas_REG_dataframe_to_table(
-                df_dispersion_sorted, "REG_" + disp_name_new + "_table", SAVE_FIG=SAVE_FIG
+                df_dispersion_sorted,
+                "REG_" + disp_name_new + "_table",
+                SAVE_FIG=SAVE_FIG,
             )
             pd.DataFrame(
                 data=np.array(iqa_disp).transpose(), columns=iqa_disp_header
@@ -460,13 +474,16 @@ def main():
             )
             pd.DataFrame(
                 data=np.concatenate(
-                    (np.array(iqa_polarisation_terms), np.array(iqa_charge_transfer_terms))
+                    (
+                        np.array(iqa_polarisation_terms),
+                        np.array(iqa_charge_transfer_terms),
+                    )
                 ).transpose(),
                 columns=np.concatenate(
                     (iqa_polarisation_headers, iqa_charge_transfer_headers)
                 ),
             ).to_excel(energy_writer, sheet_name="pl_ct_energies")
-    
+
         # OUTPUT OF ALL INTER AND INTRA TERMS SELECTED BY THE USER
         all_prop_names = inter_prop_names + intra_prop_names
         for i in range(len(inter_prop) + len(intra_prop)):
@@ -475,12 +492,16 @@ def main():
                 df_property_sorted = pd.concat(
                     [df_property_sorted, list_property_final[j][i]], axis=1
                 )
-            df_property_sorted.to_csv("REG_" + all_prop_names[i] + "_analysis.csv", sep=",")
+            df_property_sorted.to_csv(
+                "REG_" + all_prop_names[i] + "_analysis.csv", sep=","
+            )
             df_property_sorted.to_excel(writer, sheet_name="REG_" + all_prop_names[i])
             rv.pandas_REG_dataframe_to_table(
-                df_property_sorted, "REG_" + all_prop_names[i] + "_table", SAVE_FIG=SAVE_FIG
+                df_property_sorted,
+                "REG_" + all_prop_names[i] + "_table",
+                SAVE_FIG=SAVE_FIG,
             )
-    
+
         # FINAL COMPARISON
         df_final_sorted = pd.DataFrame()
         for i in range(len(reg_inter[0])):
@@ -501,13 +522,15 @@ def main():
                 axis=1,
             )
             df_final.to_csv("REG_full_comparison_seg_" + str(i + 1) + ".csv", sep=",")
-            df_final.to_excel(writer, sheet_name="REG_full_comparison_seg_" + str(i + 1))
+            df_final.to_excel(
+                writer, sheet_name="REG_full_comparison_seg_" + str(i + 1)
+            )
         df_final_sorted.to_csv("REG_final_analysis.csv", sep=",")
         df_final_sorted.to_excel(writer, sheet_name="REG_final")
         rv.pandas_REG_dataframe_to_table(
             df_final_sorted, "REG_final_table", SAVE_FIG=SAVE_FIG
         )
-    
+
         writer.save()
         energy_writer.save()
         rv.plot_violin(
@@ -515,7 +538,7 @@ def main():
             save=SAVE_FIG,
             file_name="violin.png",
         )  # Violing plot of R vs Segments
-    
+
     ###############################################################################
     #                                                                             #
     #                                   GRAPHS                                    #
@@ -527,7 +550,7 @@ def main():
         )
     else:
         critical_points = turning_points
-    
+
     rv.plot_segment(
         cc,
         2625.50 * (total_energy_wfn - (sum(total_energy_wfn) / len(total_energy_wfn))),
@@ -540,19 +563,21 @@ def main():
         save=SAVE_FIG,
         file_name="REG_analysis.png",
     )
-    
+
     # TODO: reg_vis needs to be revisited
     # if DETAILED_ANALYSIS:
     #     for i in range(len(reg_inter[0])):
     #         rv.generate_data_vis(dataframe_list[i], [dataframe_list[i]['R'] for i in range(len(reg_inter[0]))],
     #                              n_terms, save=SAVE_FIG, file_name='detailed_seg_' + str(i + 1) + '.png',
     #                              title=SYS + ' seg. ' + str(i + 1))
-    
+
     ###ENDING TIMER ###
     print(
         "--- Total time for REG Analysis: {s} minutes ---".format(
             s=((time.time() - start_time) / 60)
         )
     )
+
+
 if __name__ == "__main__":
     main()

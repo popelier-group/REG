@@ -274,7 +274,7 @@ if DISPERSION:
         if os.path.isfile((cwd + "/" + reg_folders[i] + "/" + wfn_filelist[i])):
             os.chdir((cwd + "/" + reg_folders[i] + "/"))
             xyz_file = gauss_u.get_xyz_file(g16_out_file[i])
-            disp_u.run_DFT_D3(DFT_D3_PATH, xyz_file, DISP_FUNCTIONAL,BJ_DAMPING)
+            disp_u.run_DFT_D3(DFT_D3_PATH, xyz_file, DISP_FUNCTIONAL, BJ_DAMPING)
 
     folders_disp = [
         cwd + "/" + reg_folders[i] + "/dft-d3.log" for i in range(0, len(reg_folders))
