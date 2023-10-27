@@ -96,9 +96,11 @@ class REGFolder:
     def __init__(self, path: Path):
         self.path = Path(path)
         self.file_extensions = set()
+        # self._parse_atomicfiles()
         self._create_attributes()
         self._check_main_extensions()
         self._parse_wfn()
+        self._check_xyz()
 
     def _create_attributes(self):
         for file_path in self.path.glob("*"):
@@ -111,78 +113,153 @@ class REGFolder:
                     setattr(self, "atomicfiles", file_path)
 
     def _check_main_extensions(self):
-        if not self.wfn or not self.atomicfiles:
+        if not hasattr(self, "wfn") or not hasattr(self, "atomicfiles"):
             raise FileNotFoundError(f"{self.path} does not contain all necessary files")
 
-    @staticmethod
-    def split_string_by_intervals(s: str, intervals: List[int]) -> List[str]:
-        substrings = []
-        prev_idx = 0
-        for i in intervals:
-            substrings.append(s[prev_idx:prev_idx+i])
-            prev_idx += i
-        return substrings
+    def _check_xyz(self):
+        if not hasattr(self, "xyz"):
+            self.xyz = self._write_xyz()
 
     @staticmethod
-    def BohrToAng(value):
-        return value * 0.52917720859
-    
+    def split_by(
+        s: str, n: List[int], strip: bool = True, return_remainder: bool = True
+    ) -> List[str]:
+        """
+        split s by integer list n (Taken from ICHOR)
+        e.g.
+        ```python
+        >>> split_by('abcdefg', [1, 2, 3])
+        ['a', 'bc', 'def', 'g']
+        >>> split_by('abcdefg', [1, 2, 3], return_remainder=False)
+        ['a', 'bc', 'def']
+        ```
+        :param s: string to split
+        :param n: list of integers to split s by
+        :return: list of strings split from original
+        """
+        new_s = []
+        m = 0
+        for ni in n:
+            if m + ni >= len(s):
+                ni = len(s) - m
+            new_si = s[m : m + ni]
+            if strip:
+                new_si = new_si.strip()
+            new_s += [new_si]
+            m += ni
+        new_s += ["" for _ in range(len(n) - len(new_s))]
+        if return_remainder:
+            if m < len(s):
+                new_s += [s[m:]]
+        return new_s
+
     def _parse_wfn(self):
-        with open(self.wfn, 'r') as f:
+        with open(self.wfn, "r") as f:
             title = next(f).strip()
             header = next(f).split()
             n_atoms = int(header[6])
-            self.atoms = []
-            self.atom_types = []
+            coordinates = []
+            atom_types = []
+            atoms = {}
             line = next(f)
+            i = 1
             while not line.startswith(r"CENTRE ASSIGNMENTS"):
-                record = split_string_by_intervals(
-                    line, [4, 4, 16, 12, 12, 12, 10]
+                record = self.split_by(
+                    line, [4, 4, 16, 12, 12, 12, 10], return_remainder=True
                 )
                 atom_type = record[0]
                 x = float(record[3])
                 y = float(record[4])
                 z = float(record[5])
                 nuclear_charge = float(record[-1])  # nuclear charge, not used
-                
+                line = next(f)
+                coordinates.append([x, y, z])
+                atom_types.append(atom_type)
+                atoms[atom_type + str(i)] = np.array([x, y, z])
+                i += 1
+
+            centre_assignments = []
+            while not line.startswith(r"TYPE ASSIGNMENTS"):
+                centre_assignments.extend(list(map(int, line.split()[2:])))
                 line = next(f)
 
+            type_assignments = []
+            while not line.startswith(r"EXPONENTS"):
+                type_assignments.extend(list(map(int, line.split()[2:])))
+                line = next(f)
 
-    @classproperty
-    def total_energy(self):
-    
-    @classproperty
-    def atoms(self):
+            while not line.startswith(r"MO"):
+                line = next(f)
 
-    @staticmethod
-    def BohrTokJ(e):
-        return e * 2625.5
+            while not line.startswith(r"END DATA"):
+                line = next(f)
+                while not (line.startswith(r"MO") or line.startswith(r"END DATA")):
+                    line = next(f)
+
+            record = next(f).split()
+            total_energy = float(record[3])
+            # virial_ratio = float(record[6])
+
+        self.n_atoms = n_atoms
+        self.coordinates = np.array(coordinates)
+        self.atom_types = atom_types
+        self.atoms = atoms
+        self.total_energy_Bohr = total_energy
+        self.total_energy_kJmol = self.BohrTokJ(total_energy)
+
+    # TODO
+    def _parse_atomicfiles(self):
+        pass
+
+    def _write_xyz(self):
+        xyz_path = self.path / Path(self.wfn.stem + ".xyz")
+        with open(xyz_path, "w", encoding="utf-8") as f:
+            f.write(f"{self.n_atoms} \n\n")
+            for i, atom in enumerate(self.atom_types):
+                f.write(
+                    f"{atom} {' '.join([str(f) for f in self.BohrToAng(self.coordinates[i])])}\n"
+                )
+        return xyz_path
+
+    def BohrToAng(self, value):
+        return value * 0.52917720859
+
+    def BohrTokJ(self, value):
+        return value * 2625.5
+
+    # TODO
+    # Add reading of atomicfiles folder e.g. INTs and AB_INTs classes of ichor
+
+
+# TODO
+# Have a class similar to PointsDirectory that takes in a list of REGFolders and groups up everything.
+class REGFolders:
+    pass
+
+
+# TODO
+# This class does the simple correlation, but with different types (such as OLSR and Frechet)
+# NOTE: This might not be necessary, as we can keep all functions as a library.
+class Correlation:
+    pass
 
 
 # Current working directory
 cwd = Path.cwd()
-# Get all REG folders
-file_extensions = {".wfn", ".gjf"}
-
 unsorted_reg_folders = []
-
 # DEFINE PATHS AND FILES AUTOMATICALLY:
 for folder in cwd.glob("**/*"):
     for file in folder.glob("*"):
-        if file.suffix in file_extensions:
-            folder_name = folder.name
-            if folder_name not in unsorted_reg_folders:
-                unsorted_reg_folders.append(folder_name)
-
+        folder_name = folder.name
+        if folder_name not in unsorted_reg_folders:
+            unsorted_reg_folders.append(folder_name)
 reg_folders = natsorted(unsorted_reg_folders)
-reg_folders = [REGFolder(p) for p in reg_folders]
+# reg_folders = [REGFolder(p) for p in reg_folders]
 
-atoms = aim_u.get_atom_list_wfn(str(reg_folders[0].wfn))
-# GET TOTAL ENERGY FROM THE .WFN FILES:
-total_energy_wfn = aim_u.get_aimall_wfn_energies([p.wfn.tokjmol for p in reg_folders])
-print(total_energy_wfn)
-# xyz_files = [gauss_u.get_xyz_file(file) for file in g16_files]
+print(REGFolder(reg_folders[0]).atoms)
 quit()
+# GET TOTAL ENERGY FROM THE .WFN FILES:
+total_energy_wfn = [r.total_energy_kJmol for r in reg_folders]
 
 # Finds the root, folders and all the files within the CWD and stores them as variables:
 # 'root', 'dirs' and 'allfiles'
